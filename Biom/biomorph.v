@@ -131,7 +131,7 @@ fn (g  &Graph) generate() {
       mut k := 0
       for {
         // iteration forms
-//        z = z.multiply(z).multiply(z) + c
+        z = z.multiply(z).multiply(z) + c
         z = z.sin()+z.multiply(z)-c
 //        z = z.sin().sin() + c
 //        z = z.multiply((z.multiply(z).multiply(z).multiply(z) +c)).divide(c)
@@ -142,7 +142,8 @@ fn (g  &Graph) generate() {
 
       // set piccell on condition
       mut tmp := g.cells[i]
-      tmp[j] = int(math.abs(real_(z)) < 10 || math.abs(imag_(z)) < 10 )
+//      tmp[j] = int(math.abs(real_(z)) < 10 || math.abs(imag_(z)) < 10 )
+      tmp[j] = int(math.abs(z.re) < 10 || math.abs(z.im) < 10 )
     }
   }
   println('generated ')
