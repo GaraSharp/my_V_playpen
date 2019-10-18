@@ -30,7 +30,6 @@ const (
 
   BakColour = 240
   IterCount = 500000
-  RAND_MAX  = 2147483647  // 2^31-1 ... rand()
 )
 
 //  addition on 2019-09-17 03:12:04 
@@ -142,7 +141,8 @@ fn (g mut Graph) generate() {
 
   for cnt < IterCount {
     cnt ++
-    r := f64(rand.next(RAND_MAX))/RAND_MAX
+    // C.RAND_MAX means RAND_MAX in C
+    r := f64(rand.next(C.RAND_MAX))/C.RAND_MAX
     if r < 0.01 {
       x = 0.0
       y = 0.16*py

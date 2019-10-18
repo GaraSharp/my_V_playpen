@@ -4,7 +4,8 @@
 
 Vでシダの葉グラフィクスを表示するコードを作成しました。
 
-参考 : 反復関数系 -0 Wikipedia
+参考 : 反復関数系 - Wikipedia
+
 https://ja.wikipedia.org/wiki/%E5%8F%8D%E5%BE%A9%E9%96%A2%E6%95%B0%E7%B3%BB
 
 glfwを使った、グラフィクス表示の勉強の一環で作成しました。
@@ -19,4 +20,6 @@ september.plan によると、glfwの文字表示が国際対応になってい�
 そこで、手元にダウンロードしておいた「源ノ角ゴシック (Source Han Sans JP Medium) フォント」をRobotoMono-Regular.ttfとリネームして使ってみました。
 他の日本語フォントでも表示できると思います。
 
+2019-10-18 20:10:51 
+追記 : CのRAND_MAX が C.RAND_MAX として参照できるので、ソースを更新しました。
 
