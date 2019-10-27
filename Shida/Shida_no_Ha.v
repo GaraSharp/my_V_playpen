@@ -228,11 +228,12 @@ fn key_down(wnd voidptr, key, code, action, mods int) {
     return
   }
   // Fetch the graph object stored in the user pointer
-  switch key {
-    case glfw.KEY_ESCAPE:
+  match key {
+    glfw.KEY_ESCAPE {
 //  case GLFW_KEY_ESCAPE:
       glfw.set_should_close(wnd, true)
       println('key detections')
+    }
   }
 }
 
