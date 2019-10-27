@@ -42,16 +42,6 @@ struct Graph {
   gg      &gg.GG
 }
 
-//  real/imag part of complex number
-fn real_(c cmplx.Complex) f64 {
-  return c.abs()*math.cos(c.angle())
-}
-
-fn imag_(c cmplx.Complex) f64 {
-  return c.abs()*math.sin(c.angle())
-}
-
-
 fn main() {
   glfw.init_glfw()
   mut graph := &Graph {
@@ -204,10 +194,11 @@ println('key_down()')
   }
   // Fetch the graph object stored in the user pointer
 //  mut graph := &Graph(glfw.get_window_user_pointer(wnd))
-  switch key {
-    case glfw.KEY_ESCAPE:
+  match key {
+    glfw.KEY_ESCAPE {
 //  case GLFW_KEY_ESCAPE:
       glfw.set_should_close(wnd, true)
+    }
   }
 }
 
