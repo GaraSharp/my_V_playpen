@@ -141,7 +141,7 @@ fn (g  &Graph) generate() {
 }
 
 //  MEMO : main graph loop thread
-fn (g mut Graph) run() {
+fn (g &Graph) run() {
   for {
     g.generate()
     glfw.post_empty_event() // force window redraw
@@ -159,7 +159,7 @@ fn (g &Graph) draw_piccell(x, y f64, color_idx int) {
     BlockSize-1, BlockSize-1, gx.rgb(240, 0, 0))
 }
 
-fn (g mut Graph) draw_curve() {
+fn (g &Graph) draw_curve() {
 
   for j := 0; j < WinHeight; j++ {
     for i := 0; i < WinWidth; i++ {
@@ -174,7 +174,7 @@ fn (g mut Graph) draw_curve() {
 }
 
 
-fn (g mut Graph) draw_scene() {
+fn (g &Graph) draw_scene() {
 
   g.draw_curve()
 }
