@@ -190,7 +190,7 @@ fn (g &Graph) draw_piccell(x, y f64, color_idx int) {
 }
 
 
-fn (g mut Graph) draw_curve() {
+fn (g &Graph) draw_curve() {
   for j := 0; j < WinHeight; j++ {
     for i := 0; i < WinWidth; i++ {
       tmp := g.cells[i]
