@@ -55,7 +55,7 @@ struct Graph {
   gg     &gg.GG
 
     // ft context for font drawing
-  ft          &freetype.Context
+  ft          &freetype.FreeType
   font_loaded bool
 }
 
@@ -181,22 +181,13 @@ fn (g &Graph) run() {
 }
 
 
-//  place piccell on screen
-fn (g &Graph) draw_piccell(x, y f64, color_idx int) {
-  i := (x - X_min)/(X_max - X_min)*WinWidth
-  j := (Y_max - y)/(Y_max - Y_min)*WinHeight
-  g.gg.draw_rect(i, j,
-    BlockSize-1, BlockSize-1, gx.rgb(240, 0, 0))
-}
-
-
 fn (g &Graph) draw_curve() {
   for j := 0; j < WinHeight; j++ {
     for i := 0; i < WinWidth; i++ {
       tmp := g.cells[i]
       if tmp[j] == 1 {
         g.gg.draw_rect(i, j,
-          BlockSize-1, BlockSize-1, gx.rgb(0, 0, 240))
+          BlockSize-1, BlockSize-1, gx.rgb(10, 100, 10))
       }
     }
   }
