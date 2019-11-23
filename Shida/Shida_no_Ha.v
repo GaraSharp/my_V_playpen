@@ -71,6 +71,7 @@ fn main() {
       window_title: 'Recursive Fern graphics with V'
       window_user_ptr: graph 
     })
+    ft: 0  //  evasive warning : pointer field `Graph*.ft` must be initialized
   } 
 
   println('window size : $WinWidth x $WinHeight')
@@ -85,6 +86,9 @@ fn main() {
       use_ortho: true
       font_size: 30
       scale: 2
+      window_user_ptr: graph //  evasive warning : pointer field `gg.Cfg.window_user_ptr` must be initialized
+
+
   })
   graph.font_loaded = (graph.ft != 0 )
 
