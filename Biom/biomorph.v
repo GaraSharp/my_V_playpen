@@ -132,7 +132,6 @@ fn (g  &Graph) generate() {
 
       // set piccell on condition
       mut tmp := g.cells[i]
-//      tmp[j] = int(math.abs(real_(z)) < 10 || math.abs(imag_(z)) < 10 )
       tmp[j] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { 1 } else { 0 }
     }
   }
@@ -199,6 +198,7 @@ println('key_down()')
 //  case GLFW_KEY_ESCAPE:
       glfw.set_should_close(wnd, true)
     }
+    else { }
   }
 }
 
