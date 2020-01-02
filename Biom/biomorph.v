@@ -88,7 +88,7 @@ fn main() {
 //  no used ...
 fn (g  Graph) init_graph() {
 
-  rand.seed(time.now().uni)
+  rand.seed(time.now().unix)
 }
 
 //  initialize cell space
@@ -122,9 +122,9 @@ fn (g  &Graph) generate() {
       for {
         // iteration forms
         z = z.multiply(z).multiply(z) + c
-        z = z.sin()+z.multiply(z)-c
-//        z = z.sin().sin() + c
-//        z = z.multiply((z.multiply(z).multiply(z).multiply(z) +c)).divide(c)
+//        z = z.sin()+z.multiply(z)-c
+        z = z.sin().sin() + c
+        z = z.multiply((z.multiply(z).multiply(z).multiply(z) +c)).divide(c)
         k++
         if k > 10 { break }
         if z.abs() >= 10 { break }
