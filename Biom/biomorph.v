@@ -102,7 +102,7 @@ fn (g mut Graph) init_cell() {
 //  Hot code reloading 
 //  for change constant and iteration form dynamicaly
 [live]
-fn (g  &Graph) generate() {
+fn (g mut Graph) generate() {
 
   print('generate, ')
 
@@ -121,9 +121,10 @@ fn (g  &Graph) generate() {
       mut k := 0
       for {
         // iteration forms
+        // modify these lines as you like ...
         z = z.multiply(z).multiply(z) + c
 //        z = z.sin()+z.multiply(z)-c
-        z = z.sin().sin() + c
+//        z = z.sin().sin() + c
         z = z.multiply((z.multiply(z).multiply(z).multiply(z) +c)).divide(c)
         k++
         if k > 10 { break }
@@ -131,8 +132,9 @@ fn (g  &Graph) generate() {
       }
 
       // set piccell on condition
-      mut tmp := g.cells[i]
-      tmp[j] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { 1 } else { 0 }
+//      mut tmp := g.cells[i]
+//      tmp[j] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { 1 } else { 0 }
+      g.cells[i][j] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { 1 } else { 0 }
     }
   }
   println('generated ')
@@ -140,7 +142,7 @@ fn (g  &Graph) generate() {
 }
 
 //  MEMO : main graph loop thread
-fn (g &Graph) run() {
+fn (g mut Graph) run() {
   for {
     g.generate()
     glfw.post_empty_event() // force window redraw
@@ -158,14 +160,15 @@ fn (g &Graph) draw_piccell(x, y f64, color_idx int) {
     BlockSize-1, BlockSize-1, gx.rgb(240, 0, 0))
 }
 
-fn (g &Graph) draw_curve() {
+fn (g mut Graph) draw_curve() {
 
   for j := 0; j < WinHeight; j++ {
     for i := 0; i < WinWidth; i++ {
       // TODO: if g.cells[y][x] != 0
-      tmp := g.cells[i]
-      if tmp[j] == 1 {
-        g.gg.draw_rect(i, j,
+//      tmp := g.cells[i]
+//      if tmp[j] == 1 {
+      if g.cells[i][j] == 1 {
+          g.gg.draw_rect(i, j,
           BlockSize-1, BlockSize-1, gx.rgb(0, 0, 240))
       }
     }
@@ -173,7 +176,7 @@ fn (g &Graph) draw_curve() {
 }
 
 
-fn (g &Graph) draw_scene() {
+fn (g mut Graph) draw_scene() {
 
   g.draw_curve()
 }
