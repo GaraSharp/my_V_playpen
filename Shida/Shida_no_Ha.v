@@ -44,7 +44,7 @@ const (
 // Fern graphics canvas
 struct Graph {
 mut:
-// graphics pic-cell array
+    // graphics pic-cell array
     cells       [][]int
     // gg context for drawing
     gg          &gg.GG
@@ -87,7 +87,7 @@ fn main() {
             use_ortho: true // This is needed for 2D drawing
             
             create_window: true
-            window_title: 'Recursive Fern graphics with V'
+            window_title: 'Iterative Fern graphics with V'
             window_user_ptr: graph
         })
         ft: 0 // evasive warning : pointer field `Graph*.ft` must be initialized
@@ -156,25 +156,25 @@ fn (g mut Graph) generate() {
             y = 0.16 * py
         }
         if r >= 0.01 && r < 0.07 {
-            x = 0.2 * px - 0.26 * py
+            x = 0.2  * px - 0.26 * py
             y = 0.23 * px + 0.22 * py + 1.6
         }
         if r >= 0.07 && r < 0.15 {
             x = -0.15 * px + 0.28 * py
-            y = 0.26 * px + 0.24 * py + 0.44
+            y =  0.26 * px + 0.24 * py + 0.44
         }
         if r >= 0.15 {
-            x = 0.85 * px + 0.04 * py
+            x =  0.85 * px + 0.04 * py
             y = -0.04 * px + 0.85 * py + 1.6
         }
         px = x
         py = y
         /*  set pic-cell colour on  */
-
         i := int((py - Y_min) / (Y_max - Y_min) * WinWidth)
         j := WinHeight - int((X_max - px) / (X_max - X_min) * WinHeight)
-        mut tmp := g.cells[i]
-        tmp[j] = 1
+//        mut tmp := g.cells[i]
+//        tmp[j] = 1
+        g.cells[i][j] = 1
     }
     println('generated ')
 }
@@ -190,9 +190,10 @@ fn (g &Graph) run() {
 fn (g &Graph) draw_curve() {
     for j := 0; j < WinHeight; j++ {
         for i := 0; i < WinWidth; i++ {
-            tmp := g.cells[i]
-            if tmp[j] == 1 {
-                g.gg.draw_rect(i, j, BlockSize - 1, BlockSize - 1, gx.rgb(10, 100, 10))
+//            tmp := g.cells[i]
+//            if tmp[j] == 1 {
+            if g.cells[i][j] == 1 {
+                g.gg.draw_rect(i, j, BlockSize-1, BlockSize-1, gx.rgb(10, 100, 10))
             }
         }
     }
