@@ -28,8 +28,9 @@ const (
   WinWidth  = 640   // window size
   WinHeight = 480
   TimerPeriod = 250 // ms
+  PicColour  = gx.rgb(0, 0, 240)
+  BakColour  = gx.rgb(240, 240, 240)
 
-  BakColour = 240
 )
 
 //  'biomorph' canvas
@@ -44,34 +45,34 @@ struct Graph {
 
 fn main() {
   glfw.init_glfw()
-  mut graph := &Graph {
-    gg: gg.new_context(gg.Cfg {  //  graphix contexts
+
+  gconfig := gg.Cfg {  //  graphix contexts
       width:  WinWidth
       height: WinHeight
       use_ortho: true   // This is needed for 2D drawing
       create_window: true
       window_title: 'Pickovers\' Biomorph with V'
-      window_user_ptr: graph 
-    })
-  } 
+  }
+
+  mut graph := &Graph {
+    gg: gg.new_context(gconfig)
+  }
+
   println('Window size : $WinWidth x $WinHeight')
 
-  graph.gg.window.set_user_ptr(graph) // TODO remove this when `window_user_ptr:` works 
+//  graph.gg.window.set_user_ptr(graph) // TODO remove this when `window_user_ptr:` works 
   graph.gg.window.onkeydown(key_down)  // MEMO : key event set
 
   graph.init_cell()
 
   go graph.run() // Run the graph loop in a new thread
 
-  gl.clear_color(BakColour, BakColour, BakColour,  255)
-  gl.clear()
+  gg.clear(BakColour)
   graph.gg.render() 
 
   // MEMO : main loop ; Window Realize, Map, and Quit
   for {
-    gl.clear()
-    gl.clear_color(BakColour, BakColour, BakColour,  255)
-
+    gg.clear(BakColour)
     //  clear and draw graph
     graph.draw_scene()
     //  render and event wait (?)
@@ -122,9 +123,9 @@ fn (g mut Graph) generate() {
       for {
         // iteration forms
         // modify these lines as you like ...
-        z = z*z*z*z + c
-//        z = z.sin()+z*z - c
-//        z = z.sin().sin() + c
+//        z = z*z*z*z + c
+        z = z.sin()+z*z - c
+        z = z.sin().sin() + c
 //        z = (z*z*z*z*z+c)/z
         k++
         if k > 10 { break }
@@ -169,7 +170,7 @@ fn (g mut Graph) draw_curve() {
 //      if tmp[j] == 1 {
       if g.cells[i][j] == 1 {
           g.gg.draw_rect(i, j,
-          BlockSize-1, BlockSize-1, gx.rgb(0, 0, 240))
+          BlockSize-1, BlockSize-1, PicColour)
       }
     }
   }
@@ -197,8 +198,7 @@ println('key_down()')
   // Fetch the graph object stored in the user pointer
 //  mut graph := &Graph(glfw.get_window_user_pointer(wnd))
   match key {
-    glfw.KEY_ESCAPE {
-//  case GLFW_KEY_ESCAPE:
+    (glfw.key_escape) {
       glfw.set_should_close(wnd, true)
     }
     else { }
