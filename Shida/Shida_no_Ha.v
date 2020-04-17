@@ -7,10 +7,12 @@
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
 
+//module main
+
 import rand
 import time
 import gx
-import gl
+//import gl
 import gg
 import glfw
 import freetype
@@ -26,19 +28,22 @@ const (
     WinWidth  = 1150 // window size
     WinHeight = 600
     TimerPeriod = 2000 // ms
-    BakColour = 240
-    IterCount = 500000
+    TextColour = gx.rgb(3, 3, 3)
+    LeafColour = gx.rgb(10, 100, 10)
+    BakColour  = gx.rgb(240, 240, 240)
+    IterCount  = 500000
 )
 // addition on 2019-09-17 03:12:04
 const (
-    TextSize = 12
+    FontSize = 30
 )
 
 const (
     text_cfg = gx.TextCfg{
-        align: gx.ALIGN_LEFT
-        size: TextSize
-        color: gx.rgb(0, 0, 0)
+//        align: gx.ALIGN_LEFT
+		align: gx.align_left
+        size:  FontSize
+        color: TextColour
     }
 )
 // Fern graphics canvas
@@ -79,44 +84,52 @@ fn main() {
 
     glfw.init_glfw() // change on 2019-10-12 19:49:38
 
-    mut graph := &Graph{
-        gg: gg.new_context(gg.Cfg{
-            // graphix contexts
-            width:  WinWidth
-            height: WinHeight
-            use_ortho: true // This is needed for 2D drawing
-            
-            create_window: true
-            window_title: 'Iterative Fern graphics with V'
-            window_user_ptr: graph
-        })
-        ft: 0 // evasive warning : pointer field `Graph*.ft` must be initialized
-        
-    }
+    // new way to set graphics structure on 0.1.26
+	gconfig := gg.Cfg {
+			width: WinWidth
+			height: WinHeight
+			use_ortho: true // This is needed for 2D drawing
+			create_window: true
+			window_title: 'Iterative Fern graphics with V'
+	}
+
+	fconfig := gg.Cfg{
+			width: WinWidth
+			height: WinHeight
+			use_ortho: true
+			font_path: jp_font
+			font_size: 18
+			scale: 2
+			window_user_ptr: 0
+	}
+
+	mut graph := &Graph {
+		gg: gg.new_context(gconfig)
+		ft: freetype.new_context(fconfig)
+	}
+
     println('window size : $WinWidth x $WinHeight')
-    graph.gg.window.set_user_ptr(graph) // TODO remove this when `window_user_ptr:` works
+
     graph.gg.window.onkeydown(key_down) // MEMO : key event set
     // Try to load font
     graph.ft = freetype.new_context(gg.Cfg{
         font_path: jp_font
-        width: WinWidth
+        width:  WinWidth
         height: WinHeight
         use_ortho: true
-        font_size: 30
+        font_size: FontSize
         scale: 2
-        window_user_ptr: graph // evasive warning : pointer field `gg.Cfg.window_user_ptr` must be initialized
-        
     })
+
     graph.font_loaded = (graph.ft != 0)
     graph.generate()
     go graph.run() // Run the graph loop in a new thread
-    gl.clear_color(BakColour, BakColour, BakColour, 255)
-    gl.clear()
+
+    gg.clear(BakColour)
     graph.gg.render()
     // MEMO : main loop ; Window Realize, Map, and Quit
     for {
-        gl.clear()
-        gl.clear_color(BakColour, BakColour, BakColour, 255)
+        gg.clear(BakColour)
         // clear and draw graph
         graph.draw_scene()
         // render() で画像表示とイベント待ち。らしい ?
@@ -137,16 +150,17 @@ fn (g &Graph) init_graph() {
 
 // cell array generates
 fn (g mut Graph) generate() {
-    print('generate, ')
-    // initialize cell space
-    for i := 0; i < WinWidth; i++ {
-        g.cells << [0].repeat(WinHeight)
-    }
-    mut x := f64(0)
-    mut y := f64(0)
+    mut x  := f64(0)
+    mut y  := f64(0)
     mut px := f64(0)
     mut py := f64(0)
     mut cnt := 0
+    print('generate, ')
+    // initialize cell space
+    for i in 0..WinWidth {
+        g.cells << [0].repeat(WinHeight)
+    }
+
     for cnt < IterCount {
         cnt++
         // C.RAND_MAX means RAND_MAX in C
@@ -172,8 +186,6 @@ fn (g mut Graph) generate() {
         /*  set pic-cell colour on  */
         i := int((py - Y_min) / (Y_max - Y_min) * WinWidth)
         j := WinHeight - int((X_max - px) / (X_max - X_min) * WinHeight)
-//        mut tmp := g.cells[i]
-//        tmp[j] = 1
         g.cells[i][j] = 1
     }
     println('generated ')
@@ -188,12 +200,10 @@ fn (g &Graph) run() {
 }
 
 fn (g &Graph) draw_curve() {
-    for j := 0; j < WinHeight; j++ {
-        for i := 0; i < WinWidth; i++ {
-//            tmp := g.cells[i]
-//            if tmp[j] == 1 {
+    for j in 0..WinHeight {
+        for i  in 0..WinWidth {
             if g.cells[i][j] == 1 {
-                g.gg.draw_rect(i, j, BlockSize-1, BlockSize-1, gx.rgb(10, 100, 10))
+                g.gg.draw_rect(i, j, BlockSize-1, BlockSize-1, LeafColour)
             }
         }
     }
@@ -211,7 +221,7 @@ fn (g mut Graph) draw_scene() {
 }
 
 // 以下のkey_down() では、キー入力で、ESCキーの場合に
-// glfw.set_shoulkd_close を true にする、らしい
+// glfw.set_should_close を true にする、らしい
 // TODO: this exposes the unsafe C interface, clean up
 fn key_down(wnd voidptr, key, code, action, mods int) {
     println('key_down()')
@@ -222,9 +232,13 @@ fn key_down(wnd voidptr, key, code, action, mods int) {
     if action != 2 && action != 1 {
         return
     }
+
+	// Fetch the game object stored in the user pointer
+	mut graph := &Graph(glfw.get_window_user_pointer(wnd))
+
     // Fetch the graph object stored in the user pointer
     match key {
-        glfw.KEY_ESCAPE {
+        (glfw.key_escape) {  // parsing problem ? need parenthesis to embed key code
             // case GLFW_KEY_ESCAPE:
             glfw.set_should_close(wnd, true)
             println('key detections')
