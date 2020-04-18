@@ -11,6 +11,8 @@
 
 import rand
 import time
+import term
+import strings
 import gx
 //import gl
 import gg
@@ -73,9 +75,19 @@ fn main() {
     //  font searching
     mut jp_font := ''
     for f in fils {
-        print('font $f - ')
-        println(os.exists(f))
-        if os.exists(f) { 
+        stat := os.exists(f)
+        match stat {
+          true {
+            print(term.ok_message  ('[ OK ]'))
+          }
+          false {
+            print(term.fail_message('[FAIL]'))
+          }
+          else { }
+        }
+        println(' $f')
+        
+        if stat { 
             jp_font = f
             println('Get font file Nooow !')
             break 
@@ -241,7 +253,7 @@ fn key_down(wnd voidptr, key, code, action, mods int) {
         (glfw.key_escape) {  // parsing problem ? need parenthesis to embed key code
             // case GLFW_KEY_ESCAPE:
             glfw.set_should_close(wnd, true)
-            println('key detections')
+            println('ESC key detections')
         }
         else {}
     }
