@@ -1,11 +1,13 @@
-// title : biomorph.v 
+// title : Biom.v 
 // begin : 2019-09-06 21:38:31  
-// note  : draw Pickovers' Biomorph in V
+// note  : draw Pickovers' Biomorph with V
 // base  : graphix_1.v
 
 // Copyright (c) 2019 Alexander Medvednikov. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.  
+
+module main
 
 import rand
 import time
@@ -124,7 +126,7 @@ fn (g mut Graph) generate() {
         // iteration forms
         // modify these lines as you like ...
 //        z = z*z*z*z + c
-        z = z.sin()+z*z - c
+//        z = z.sin()+z*z - c
         z = z.sin().sin() + c
 //        z = (z*z*z*z*z+c)/z
         k++
