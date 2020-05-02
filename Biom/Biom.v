@@ -126,9 +126,9 @@ fn (g mut Graph) generate() {
         // iteration forms
         // modify these lines as you like ...
 //        z = z*z*z*z + c
-//        z = z.sin()+z*z - c
-        z = z.sin().sin() + c
-//        z = (z*z*z*z*z+c)/z
+        z = z.sin()+z*z - c
+//        z = z.sin().sin() + c
+        z = (z*z*z*z*z+c)/z
         k++
         if k > 10 { break }
         if z.abs() >= 10 { break }
