@@ -7,12 +7,10 @@
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
 
-//module main
-
 import rand
 import time
 import term
-import strings
+//import strings
 import gx
 //import gl
 import gg
@@ -26,23 +24,19 @@ const (
     X_max =  3.0
     Y_min = -0.5
     Y_max = 11.0
-    BlockSize = 2
-    WinWidth  = 1150 // window size
-    WinHeight = 600
-    TimerPeriod = 2000 // ms
-    TextColour = gx.rgb(3, 3, 3)
-    LeafColour = gx.rgb(10, 100, 10)
-    BakColour  = gx.rgb(240, 240, 240)
-    IterCount  = 500000
-)
-// addition on 2019-09-17 03:12:04
-const (
-    FontSize = 30
+    BlockSize   = 2
+    WinWidth    = 1150 // window size
+    WinHeight   = 600
+    TextColour  = gx.rgb(3, 3, 3)
+    LeafColour  = gx.rgb(10, 100, 10)
+    BakColour   = gx.rgb(240, 240, 240)
+    FontSize    = 30
+    IterCount   = 500000
+    TimerPeriod = 500   // ms
 )
 
 const (
-    text_cfg = gx.TextCfg{
-//        align: gx.ALIGN_LEFT
+    text_cfg = gx.TextCfg {
 		align: gx.align_left
         size:  FontSize
         color: TextColour
@@ -110,7 +104,7 @@ fn main() {
 			height: WinHeight
 			use_ortho: true
 			font_path: jp_font
-			font_size: 18
+//			font_size: 18
 			scale: 2
 			window_user_ptr: 0
 	}
@@ -137,13 +131,16 @@ fn main() {
     graph.generate()
     go graph.run() // Run the graph loop in a new thread
 
-    gg.clear(BakColour)
-    graph.gg.render()
+    //  for double buffer like behaviour ...
+    for _ in 0..2 {
+      gg.clear(BakColour)
+      graph.draw_scene()
+      graph.gg.render()
+    }
     // MEMO : main loop ; Window Realize, Map, and Quit
     for {
-        gg.clear(BakColour)
-        // clear and draw graph
-        graph.draw_scene()
+        //  this code does not need redraw new graphix,
+        //  so, render() for key event and flip double buffer ... ?
         // render() で画像表示とイベント待ち。らしい ?
         graph.gg.render()
         if graph.gg.window.should_close() {
@@ -151,7 +148,7 @@ fn main() {
             return
         }
         time.sleep_ms(TimerPeriod)
-        // println('Sleep !')
+//        println('Sleep !')
     }
 }
 
@@ -169,7 +166,7 @@ fn (g mut Graph) generate() {
     mut cnt := 0
     print('generate, ')
     // initialize cell space
-    for i in 0..WinWidth {
+    for _ in 0..WinWidth {
         g.cells << [0].repeat(WinHeight)
     }
 
@@ -193,8 +190,7 @@ fn (g mut Graph) generate() {
             x =  0.85 * px + 0.04 * py
             y = -0.04 * px + 0.85 * py + 1.6
         }
-        px = x
-        py = y
+        px, py = x, y
         /*  set pic-cell colour on  */
         i := int((py - Y_min) / (Y_max - Y_min) * WinWidth)
         j := WinHeight - int((X_max - px) / (X_max - X_min) * WinHeight)
@@ -228,6 +224,7 @@ fn (g mut Graph) draw_message() {
 }
 
 fn (g mut Graph) draw_scene() {
+    gg.clear(BakColour)
     g.draw_curve()
     g.draw_message()
 }
@@ -246,7 +243,7 @@ fn key_down(wnd voidptr, key, code, action, mods int) {
     }
 
 	// Fetch the game object stored in the user pointer
-	mut graph := &Graph(glfw.get_window_user_pointer(wnd))
+//	mut graph := &Graph(glfw.get_window_user_pointer(wnd))
 
     // Fetch the graph object stored in the user pointer
     match key {
