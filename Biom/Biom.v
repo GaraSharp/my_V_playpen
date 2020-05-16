@@ -7,12 +7,10 @@
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.  
 
-module main
-
 import rand
 import time
 import gx 
-import gl
+//import gl
 import gg
 import glfw
 import math
@@ -26,14 +24,18 @@ const (
   Y_min     = -2.4
   Y_max     =  2.4
 
-  BlockSize = 2
-  WinWidth  = 640   // window size
-  WinHeight = 480
+  BlockSize   = 2
+  WinWidth    = 960   // window size
+  WinHeight   = 720
+  PicColour   = gx.rgb(0, 0, 240)
+  BakColour   = gx.rgb(240, 240, 240)
   TimerPeriod = 250 // ms
-  PicColour  = gx.rgb(0, 0, 240)
-  BakColour  = gx.rgb(240, 240, 240)
-
 )
+
+//  running status 
+enum Staten {
+  newparam display
+}
 
 //  'biomorph' canvas
 struct Graph {
@@ -43,6 +45,7 @@ struct Graph {
 
   // gg context for drawing
   gg      &gg.GG
+  state   Staten
 }
 
 fn main() {
@@ -58,25 +61,28 @@ fn main() {
 
   mut graph := &Graph {
     gg: gg.new_context(gconfig)
+    state: .display
   }
 
   println('Window size : $WinWidth x $WinHeight')
 
-//  graph.gg.window.set_user_ptr(graph) // TODO remove this when `window_user_ptr:` works 
+  graph.gg.window.set_user_ptr(graph) // TODO remove this when `window_user_ptr:` works 
   graph.gg.window.onkeydown(key_down)  // MEMO : key event set
 
   graph.init_cell()
 
   go graph.run() // Run the graph loop in a new thread
 
-  gg.clear(BakColour)
-  graph.gg.render() 
+  graph.generate()
+  //  draw graphix twice for double buffer like behaviour ...
+  for _ in 0..2 {
+    gg.clear(BakColour)
+    graph.draw_scene()
+    graph.gg.render() 
+  }
 
   // MEMO : main loop ; Window Realize, Map, and Quit
   for {
-    gg.clear(BakColour)
-    //  clear and draw graph
-    graph.draw_scene()
     //  render and event wait (?)
     graph.gg.render() 
 
@@ -84,19 +90,27 @@ fn main() {
       graph.gg.window.destroy()
       return 
     }
-    time.sleep_ms(20)
+    
+    if graph.state == .newparam {
+        println('... redraw()')
+        graph.generate()
+        for _ in 0..2 {
+          gg.clear(BakColour)
+          graph.draw_scene()
+        }
+        graph.state = .display
+    }
+    time.sleep_ms(TimerPeriod)
   }
 }
 
 //  no used ...
 fn (g  Graph) init_graph() {
-
   rand.seed(time.now().unix)
 }
 
 //  initialize cell space
 fn (g mut Graph) init_cell() {
-
   for i := 0; i < WinWidth; i++ {
     g.cells << [0].repeat(WinHeight)
   }
@@ -125,51 +139,42 @@ fn (g mut Graph) generate() {
       for {
         // iteration forms
         // modify these lines as you like ...
-//        z = z*z*z*z + c
+//        z = z*z*z*z*z + z*z*z + c
         z = z.sin()+z*z - c
-//        z = z.sin().sin() + c
-        z = (z*z*z*z*z+c)/z
+//        z = z.cos().cos() + c
+        z = (z*z*z*z+z*z+c)/z
         k++
-        if k > 10 { break }
-        if z.abs() >= 10 { break }
+        if k > 10 || z.abs() >= 10 { break }
       }
 
       // set piccell on condition
-//      mut tmp := g.cells[i]
-//      tmp[j] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { 1 } else { 0 }
       g.cells[i][j] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { 1 } else { 0 }
     }
   }
   println('generated ')
-
 }
 
 //  MEMO : main graph loop thread
 fn (g mut Graph) run() {
   for {
-    g.generate()
     glfw.post_empty_event() // force window redraw
     time.sleep_ms(TimerPeriod)
-    println('run()')
+//    println('run()')
   }
 }
-
 
 //  place piccell on screen
 fn (g &Graph) draw_piccell(x, y f64, color_idx int) {
   i := (x - X_min)/(X_max - X_min)*WinWidth
   j := (Y_max - y)/(Y_max - Y_min)*WinHeight
   g.gg.draw_rect(i, j,
-    BlockSize-1, BlockSize-1, gx.rgb(240, 0, 0))
+    BlockSize-1, BlockSize-1, PicColour)
 }
 
+//  
 fn (g mut Graph) draw_curve() {
-
   for j := 0; j < WinHeight; j++ {
     for i := 0; i < WinWidth; i++ {
-      // TODO: if g.cells[y][x] != 0
-//      tmp := g.cells[i]
-//      if tmp[j] == 1 {
       if g.cells[i][j] == 1 {
           g.gg.draw_rect(i, j,
           BlockSize-1, BlockSize-1, PicColour)
@@ -178,9 +183,8 @@ fn (g mut Graph) draw_curve() {
   }
 }
 
-
+//  
 fn (g mut Graph) draw_scene() {
-
   g.draw_curve()
 }
 
@@ -198,10 +202,16 @@ println('key_down()')
     return
   }
   // Fetch the graph object stored in the user pointer
-//  mut graph := &Graph(glfw.get_window_user_pointer(wnd))
+  mut graph := &Graph(glfw.get_window_user_pointer(wnd))
+  
   match key {
     (glfw.key_escape) {
       glfw.set_should_close(wnd, true)
+      println('ESC key for exit this programm')
+    }
+    (glfw.key_space) {
+      graph.state = .newparam
+      println('space bar for redraw new form in [live] ')
     }
     else { }
   }
