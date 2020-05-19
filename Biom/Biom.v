@@ -97,6 +97,7 @@ fn main() {
         for _ in 0..2 {
           gg.clear(BakColour)
           graph.draw_scene()
+          graph.gg.render()
         }
         graph.state = .display
     }
@@ -110,7 +111,7 @@ fn (g  Graph) init_graph() {
 }
 
 //  initialize cell space
-fn (g mut Graph) init_cell() {
+fn (mut g Graph) init_cell() {
   for i := 0; i < WinWidth; i++ {
     g.cells << [0].repeat(WinHeight)
   }
@@ -119,7 +120,7 @@ fn (g mut Graph) init_cell() {
 //  Hot code reloading 
 //  for change constant and iteration form dynamicaly
 [live]
-fn (g mut Graph) generate() {
+fn (mut g Graph) generate() {
 
   print('generate, ')
 
@@ -139,10 +140,10 @@ fn (g mut Graph) generate() {
       for {
         // iteration forms
         // modify these lines as you like ...
-//        z = z*z*z*z*z + z*z*z + c
+        z = z*z*z*z*z + z*z*z + c
         z = z.sin()+z*z - c
 //        z = z.cos().cos() + c
-        z = (z*z*z*z+z*z+c)/z
+//        z = (z*z*z*z+z*z+c)/z
         k++
         if k > 10 || z.abs() >= 10 { break }
       }
@@ -155,7 +156,7 @@ fn (g mut Graph) generate() {
 }
 
 //  MEMO : main graph loop thread
-fn (g mut Graph) run() {
+fn (mut g Graph) run() {
   for {
     glfw.post_empty_event() // force window redraw
     time.sleep_ms(TimerPeriod)
@@ -172,7 +173,7 @@ fn (g &Graph) draw_piccell(x, y f64, color_idx int) {
 }
 
 //  
-fn (g mut Graph) draw_curve() {
+fn (mut g Graph) draw_curve() {
   for j := 0; j < WinHeight; j++ {
     for i := 0; i < WinWidth; i++ {
       if g.cells[i][j] == 1 {
@@ -184,7 +185,7 @@ fn (g mut Graph) draw_curve() {
 }
 
 //  
-fn (g mut Graph) draw_scene() {
+fn (mut g Graph) draw_scene() {
   g.draw_curve()
 }
 
