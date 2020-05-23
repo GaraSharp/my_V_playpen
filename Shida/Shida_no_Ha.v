@@ -20,26 +20,26 @@ import os
 
 const (
 // Window coords
-    X_min = -3.0
-    X_max =  3.0
-    Y_min = -0.5
-    Y_max = 11.0
-    BlockSize   = 2
-    WinWidth    = 1150 // window size
-    WinHeight   = 600
-    TextColour  = gx.rgb(3, 3, 3)
-    LeafColour  = gx.rgb(10, 100, 10)
-    BakColour   = gx.rgb(240, 240, 240)
-    FontSize    = 30
-    IterCount   = 500000
-    TimerPeriod = 500   // ms
+    x_min = -3.0
+    x_max =  3.0
+    y_min = -0.5
+    y_max = 11.0
+    block_size   = 2
+    win_width    = 1150 // window size
+    win_height   = 600
+    text_colour  = gx.rgb(3, 3, 3)
+    leaf_colour  = gx.rgb(10, 100, 10)
+    bak_colour   = gx.rgb(240, 240, 240)
+    font_size    = 30
+    iter_count   = 500000
+    timer_period = 500   // ms
 )
 
 const (
     text_cfg = gx.TextCfg {
 		align: gx.align_left
-        size:  FontSize
-        color: TextColour
+        size:  font_size
+        color: text_colour
     }
 )
 // Fern graphics canvas
@@ -92,16 +92,16 @@ fn main() {
 
     // new way to set graphics structure on 0.1.26
 	gconfig := gg.Cfg {
-			width: WinWidth
-			height: WinHeight
+			width: win_width
+			height: win_height
 			use_ortho: true // This is needed for 2D drawing
 			create_window: true
 			window_title: 'Iterative Fern graphics with V'
 	}
 
 	fconfig := gg.Cfg{
-			width: WinWidth
-			height: WinHeight
+			width: win_width
+			height: win_height
 			use_ortho: true
 			font_path: jp_font
 //			font_size: 18
@@ -114,16 +114,16 @@ fn main() {
 		ft: freetype.new_context(fconfig)
 	}
 
-    println('window size : $WinWidth x $WinHeight')
+    println('window size : $win_width x $win_height')
 
     graph.gg.window.onkeydown(key_down) // MEMO : key event set
     // Try to load font
     graph.ft = freetype.new_context(gg.Cfg{
         font_path: jp_font
-        width:  WinWidth
-        height: WinHeight
+        width:  win_width
+        height: win_height
         use_ortho: true
-        font_size: FontSize
+        font_size: font_size
         scale: 2
     })
 
@@ -133,7 +133,7 @@ fn main() {
 
     //  for double buffer like behaviour ...
     for _ in 0..2 {
-      gg.clear(BakColour)
+      gg.clear(bak_colour)
       graph.draw_scene()
       graph.gg.render()
     }
@@ -147,7 +147,7 @@ fn main() {
             graph.gg.window.destroy()
             return
         }
-        time.sleep_ms(TimerPeriod)
+        time.sleep_ms(timer_period)
 //        println('Sleep !')
     }
 }
@@ -158,7 +158,7 @@ fn (g &Graph) init_graph() {
 }
 
 // cell array generates
-fn (g mut Graph) generate() {
+fn (mut g Graph) generate() {
     mut x  := f64(0)
     mut y  := f64(0)
     mut px := f64(0)
@@ -166,11 +166,11 @@ fn (g mut Graph) generate() {
     mut cnt := 0
     print('generate, ')
     // initialize cell space
-    for _ in 0..WinWidth {
-        g.cells << [0].repeat(WinHeight)
+    for _ in 0..win_width {
+        g.cells << [0].repeat(win_height)
     }
 
-    for cnt < IterCount {
+    for cnt < iter_count {
         cnt++
         // C.RAND_MAX means RAND_MAX in C
         r := f64(rand.next(C.RAND_MAX)) / C.RAND_MAX
@@ -192,8 +192,8 @@ fn (g mut Graph) generate() {
         }
         px, py = x, y
         /*  set pic-cell colour on  */
-        i := int((py - Y_min) / (Y_max - Y_min) * WinWidth)
-        j := WinHeight - int((X_max - px) / (X_max - X_min) * WinHeight)
+        i := int((py - y_min) / (y_max - y_min) * win_width)
+        j := win_height - int((x_max - px) / (x_max - x_min) * win_height)
         g.cells[i][j] = 1
     }
     println('generated ')
@@ -203,28 +203,28 @@ fn (g mut Graph) generate() {
 fn (g &Graph) run() {
     for {
         glfw.post_empty_event() // force window redraw
-        time.sleep_ms(TimerPeriod)
+        time.sleep_ms(timer_period)
     }
 }
 
 fn (g &Graph) draw_curve() {
-    for j in 0..WinHeight {
-        for i  in 0..WinWidth {
+    for j in 0..win_height {
+        for i  in 0..win_width {
             if g.cells[i][j] == 1 {
-                g.gg.draw_rect(i, j, BlockSize-1, BlockSize-1, LeafColour)
+                g.gg.draw_rect(i, j, block_size-1, block_size-1, leaf_colour)
             }
         }
     }
 }
 
-fn (g mut Graph) draw_message() {
+fn (mut g Graph) draw_message() {
     if g.font_loaded {
         g.ft.draw_text(100, 50, 'シダの葉グラフィクス', text_cfg)
     }
 }
 
-fn (g mut Graph) draw_scene() {
-    gg.clear(BakColour)
+fn (mut g Graph) draw_scene() {
+    gg.clear(bak_colour)
     g.draw_curve()
     g.draw_message()
 }
@@ -248,7 +248,7 @@ fn key_down(wnd voidptr, key, code, action, mods int) {
     // Fetch the graph object stored in the user pointer
     match key {
         (glfw.key_escape) {  // parsing problem ? need parenthesis to embed key code
-            // case GLFW_KEY_ESCAPE:
+            // case GLFW_KEy_ESCAPE:
             glfw.set_should_close(wnd, true)
             println('ESC key detections')
         }

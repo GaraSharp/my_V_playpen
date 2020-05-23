@@ -19,17 +19,17 @@ import math.complex as cmplx
 
 const (
   //  Window coords
-  X_min     = -3.2
-  X_max     =  3.2
-  Y_min     = -2.4
-  Y_max     =  2.4
+  x_min     = -3.2
+  x_max     =  3.2
+  y_min     = -2.4
+  y_max     =  2.4
 
-  BlockSize   = 2
-  WinWidth    = 960   // window size
-  WinHeight   = 720
-  PicColour   = gx.rgb(0, 0, 240)
-  BakColour   = gx.rgb(240, 240, 240)
-  TimerPeriod = 250 // ms
+  block_size   = 2
+  win_width    = 960   // window size
+  win_height   = 720
+  pic_colour   = gx.rgb(0, 0, 240)
+  bak_colour   = gx.rgb(240, 240, 240)
+  timer_period = 250 // ms
 )
 
 //  running status 
@@ -52,8 +52,8 @@ fn main() {
   glfw.init_glfw()
 
   gconfig := gg.Cfg {  //  graphix contexts
-      width:  WinWidth
-      height: WinHeight
+      width:  win_width
+      height: win_height
       use_ortho: true   // This is needed for 2D drawing
       create_window: true
       window_title: 'Pickovers\' Biomorph with V'
@@ -64,7 +64,7 @@ fn main() {
     state: .display
   }
 
-  println('Window size : $WinWidth x $WinHeight')
+  println('Window size : $win_width x $win_height')
 
   graph.gg.window.set_user_ptr(graph) // TODO remove this when `window_user_ptr:` works 
   graph.gg.window.onkeydown(key_down)  // MEMO : key event set
@@ -76,7 +76,7 @@ fn main() {
   graph.generate()
   //  draw graphix twice for double buffer like behaviour ...
   for _ in 0..2 {
-    gg.clear(BakColour)
+    gg.clear(bak_colour)
     graph.draw_scene()
     graph.gg.render() 
   }
@@ -95,13 +95,13 @@ fn main() {
         println('... redraw()')
         graph.generate()
         for _ in 0..2 {
-          gg.clear(BakColour)
+          gg.clear(bak_colour)
           graph.draw_scene()
           graph.gg.render()
         }
         graph.state = .display
     }
-    time.sleep_ms(TimerPeriod)
+    time.sleep_ms(timer_period)
   }
 }
 
@@ -112,8 +112,8 @@ fn (g  Graph) init_graph() {
 
 //  initialize cell space
 fn (mut g Graph) init_cell() {
-  for i := 0; i < WinWidth; i++ {
-    g.cells << [0].repeat(WinHeight)
+  for i := 0; i < win_width; i++ {
+    g.cells << [0].repeat(win_height)
   }
 }
 
@@ -130,20 +130,20 @@ fn (mut g Graph) generate() {
   //  constant - changing makes graphics changed
   c := cmplx.complex(-0.25, -0.5)
 
-  for j := 0; j < WinHeight; j++ {
-    for i := 0; i < WinWidth; i++ {
-      x = f64(i)*(X_max-X_min)/WinWidth +X_min
-      y = f64(j)*(Y_min-Y_max)/WinHeight+Y_max
+  for j := 0; j < win_height; j++ {
+    for i := 0; i < win_width; i++ {
+      x = f64(i)*(x_max-x_min)/win_width +x_min
+      y = f64(j)*(y_min-y_max)/win_height+y_max
       z = cmplx.complex(x, y)
       //  iteration part
       mut k := 0
       for {
         // iteration forms
         // modify these lines as you like ...
-        z = z*z*z*z*z + z*z*z + c
+//        z = z*z*z*z*z + z*z*z + c
         z = z.sin()+z*z - c
 //        z = z.cos().cos() + c
-//        z = (z*z*z*z+z*z+c)/z
+        z = (z*z*z*z+z*z+c)/z
         k++
         if k > 10 || z.abs() >= 10 { break }
       }
@@ -159,26 +159,26 @@ fn (mut g Graph) generate() {
 fn (mut g Graph) run() {
   for {
     glfw.post_empty_event() // force window redraw
-    time.sleep_ms(TimerPeriod)
+    time.sleep_ms(timer_period)
 //    println('run()')
   }
 }
 
 //  place piccell on screen
 fn (g &Graph) draw_piccell(x, y f64, color_idx int) {
-  i := (x - X_min)/(X_max - X_min)*WinWidth
-  j := (Y_max - y)/(Y_max - Y_min)*WinHeight
+  i := (x - x_min)/(x_max - x_min)*win_width
+  j := (y_max - y)/(y_max - y_min)*win_height
   g.gg.draw_rect(i, j,
-    BlockSize-1, BlockSize-1, PicColour)
+    block_size-1, block_size-1, pic_colour)
 }
 
 //  
 fn (mut g Graph) draw_curve() {
-  for j := 0; j < WinHeight; j++ {
-    for i := 0; i < WinWidth; i++ {
+  for j := 0; j < win_height; j++ {
+    for i := 0; i < win_width; i++ {
       if g.cells[i][j] == 1 {
           g.gg.draw_rect(i, j,
-          BlockSize-1, BlockSize-1, PicColour)
+          block_size-1, block_size-1, pic_colour)
       }
     }
   }
