@@ -107,7 +107,7 @@ fn main() {
 
 //  no used ...
 fn (g  Graph) init_graph() {
-  rand.seed(time.now().unix)
+  rand.seed(int(time.now().unix))
 }
 
 //  initialize cell space
@@ -140,9 +140,9 @@ fn (mut g Graph) generate() {
       for {
         // iteration forms
         // modify these lines as you like ...
-//        z = z*z*z*z*z + z*z*z + c
+        z = z*z*z*z*z + z*z*z + c
         z = z.sin()+z*z - c
-//        z = z.cos().cos() + c
+//         z = z.cos().cos() + c
         z = (z*z*z*z+z*z+c)/z
         k++
         if k > 10 || z.abs() >= 10 { break }
@@ -164,20 +164,12 @@ fn (mut g Graph) run() {
   }
 }
 
-//  place piccell on screen
-fn (g &Graph) draw_piccell(x, y f64, color_idx int) {
-  i := (x - x_min)/(x_max - x_min)*win_width
-  j := (y_max - y)/(y_max - y_min)*win_height
-  g.gg.draw_rect(i, j,
-    block_size-1, block_size-1, pic_colour)
-}
-
 //  
 fn (mut g Graph) draw_curve() {
   for j := 0; j < win_height; j++ {
     for i := 0; i < win_width; i++ {
       if g.cells[i][j] == 1 {
-          g.gg.draw_rect(i, j,
+          g.gg.draw_rect(f32(i), f32(j),
           block_size-1, block_size-1, pic_colour)
       }
     }

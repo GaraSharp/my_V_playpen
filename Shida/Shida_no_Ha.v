@@ -37,7 +37,7 @@ const (
 
 const (
     text_cfg = gx.TextCfg {
-		align: gx.align_left
+        align: gx.align_left
         size:  font_size
         color: text_colour
     }
@@ -91,28 +91,28 @@ fn main() {
     glfw.init_glfw() // change on 2019-10-12 19:49:38
 
     // new way to set graphics structure on 0.1.26
-	gconfig := gg.Cfg {
-			width: win_width
-			height: win_height
-			use_ortho: true // This is needed for 2D drawing
-			create_window: true
-			window_title: 'Iterative Fern graphics with V'
-	}
+    gconfig := gg.Cfg {
+            width: win_width
+            height: win_height
+            use_ortho: true // This is needed for 2D drawing
+            create_window: true
+            window_title: 'Iterative Fern graphics with V'
+    }
 
-	fconfig := gg.Cfg{
-			width: win_width
-			height: win_height
-			use_ortho: true
-			font_path: jp_font
-//			font_size: 18
-			scale: 2
-			window_user_ptr: 0
-	}
+    fconfig := gg.Cfg{
+            width: win_width
+            height: win_height
+            use_ortho: true
+            font_path: jp_font
+//            font_size: 18
+            scale: 2
+            window_user_ptr: 0
+    }
 
-	mut graph := &Graph {
-		gg: gg.new_context(gconfig)
-		ft: freetype.new_context(fconfig)
-	}
+    mut graph := &Graph {
+        gg: gg.new_context(gconfig)
+        ft: freetype.new_context(fconfig)
+    }
 
     println('window size : $win_width x $win_height')
 
@@ -133,9 +133,9 @@ fn main() {
 
     //  for double buffer like behaviour ...
     for _ in 0..2 {
-      gg.clear(bak_colour)
-      graph.draw_scene()
-      graph.gg.render()
+        gg.clear(bak_colour)
+        graph.draw_scene()
+        graph.gg.render()
     }
     // MEMO : main loop ; Window Realize, Map, and Quit
     for {
@@ -154,7 +154,8 @@ fn main() {
 
 // no used ...
 fn (g &Graph) init_graph() {
-    rand.seed(time.now().unix)
+//    rand.seed(time.now().unix)
+    rand.seed(int(time.now().unix))
 }
 
 // cell array generates
@@ -211,7 +212,7 @@ fn (g &Graph) draw_curve() {
     for j in 0..win_height {
         for i  in 0..win_width {
             if g.cells[i][j] == 1 {
-                g.gg.draw_rect(i, j, block_size-1, block_size-1, leaf_colour)
+                g.gg.draw_rect(f32(i), f32(j), block_size-1, block_size-1, leaf_colour)
             }
         }
     }
@@ -242,8 +243,8 @@ fn key_down(wnd voidptr, key, code, action, mods int) {
         return
     }
 
-	// Fetch the game object stored in the user pointer
-//	mut graph := &Graph(glfw.get_window_user_pointer(wnd))
+    // Fetch the game object stored in the user pointer
+//    mut graph := &Graph(glfw.get_window_user_pointer(wnd))
 
     // Fetch the graph object stored in the user pointer
     match key {
