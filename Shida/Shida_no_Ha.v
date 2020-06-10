@@ -31,24 +31,24 @@ mut:
     // graphics pic-cell array
     cells       [][]int
 
-	gg       &gg.Context
-	x        int
-	y        int
-	dy       int
-	dx       int
-	height   int
-	width    int
-	draw_fn  voidptr
+    gg       &gg.Context
+    x        int
+    y        int
+    dy       int
+    dx       int
+    height   int
+    width    int
+    draw_fn  voidptr
 
-	// ft context for font drawing
-	ft          &ft.FT = voidptr(0)
-	font_loaded bool
+    // ft context for font drawing
+    ft          &ft.FT = voidptr(0)
+    font_loaded bool
 
-	// frame/time counters for showfps()
-	frame int
-	frame_old int
-	frame_sw  time.StopWatch = time.new_stopwatch({})
-	second_sw time.StopWatch = time.new_stopwatch({})
+    // frame/time counters for showfps()
+    frame int
+    frame_old int
+    frame_sw  time.StopWatch = time.new_stopwatch({})
+    second_sw time.StopWatch = time.new_stopwatch({})
 
 }
 
@@ -59,9 +59,9 @@ const (
     y_min = -0.5
     y_max = 11.0
     block_size    = 3
-	window_width  = 1150
-	window_height = 600
-	width = 50
+    window_width  = 1150
+    window_height = 600
+    width = 50
     leaf_colour  = gx.rgb(10, 100, 10)
     //  this case's maximum count
     //  I don't know why, but sokol lib allocates graphix obj numbers
@@ -72,18 +72,18 @@ const (
 
 //  font contexts
 const (
-	text_cfg = gx.TextCfg {
-		align:gx.align_left
-		size:10
-//		color:gx.black
-		color:gx.rgb(0, 0, 0)
-	}
-	lett_cfg = gx.TextCfg {
-		align:gx.align_left
-		size:int(width*0.6)
-		color:gx.green
-//		color:gx.rgb(0, 0, 0)
-	}
+    text_cfg = gx.TextCfg {
+        align:gx.align_left
+        size:10
+//        color:gx.black
+        color:gx.rgb(0, 0, 0)
+    }
+    lett_cfg = gx.TextCfg {
+        align:gx.align_left
+        size:width
+        color:gx.green
+//        color:gx.rgb(0, 0, 0)
+    }
 )
 
 
@@ -123,78 +123,78 @@ fn alloc_font(mut graph Graph){
 
     println('ready for action in new graphix handling ...')
 
-	x := ft.new({ font_path: jp_font, scale: sapp.dpi_scale() }) or {panic(err)}
+    x := ft.new({ font_path: jp_font, scale: sapp.dpi_scale() }) or {panic(err)}
     println('loadin fonts')
-	graph.ft = x
-	graph.font_loaded = true
+    graph.ft = x
+    graph.font_loaded = true
 }
 
 //  
 fn main() {
-	mut graph := &Graph {
-		gg: 0  // place holdre for graphix context
-		dx: 2
-		dy: 2
-		height: window_height
-		width:  window_width
-		draw_fn: 0
-	}
-	graph.gg = gg.new_context({
-		width: window_width
-		height: window_height
-//		font_size: 12
-		use_ortho: true
-		user_data: graph
-		window_title: 'Iterative Fern graphics with V new graphix handling.'
-		create_window: true
-		frame_fn: frame
-		init_fn:  alloc_font
-		event_fn: on_event
-		bg_color: gx.white
-	})
+    mut graph := &Graph {
+        gg: 0  // place holdre for graphix context
+        dx: 2
+        dy: 2
+        height: window_height
+        width:  window_width
+        draw_fn: 0
+    }
+    graph.gg = gg.new_context({
+        width: window_width
+        height: window_height
+//        font_size: 12
+        use_ortho: true
+        user_data: graph
+        window_title: 'Iterative Fern graphics with V new graphix handling.'
+        create_window: true
+        frame_fn: frame
+        init_fn:  alloc_font
+        event_fn: on_event
+        bg_color: gx.white
+    })
 
     graph.generate()
 
-	println('Starting the graph loop...')
+    println('Starting the graph loop...')
     // main graphix obj placing thread .
-	go graph.run()
+    go graph.run()
     //  gg.run() calls frame_fn (and maybe calls event_fn )
-	graph.gg.run()
+    graph.gg.run()
 }
 
 //  frame rate (fps) and some info reports
 //  this feature activate with commenting out follow line.
 [if showfps]
 fn (graph &Graph) showfps() {
-	graph.frame++
-	last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0
-	ticks := f64(graph.second_sw.elapsed().microseconds())/1000.0
-	if ticks > 999.0 {
-		fps := f64(graph.frame - graph.frame_old)*ticks/1000.0
-		eprintln('fps: ${fps:5.1f} | last frame took: ${last_frame_ms:6.3f}ms | frame: ${graph.frame:6} ')
-		graph.second_sw.restart()
-		graph.frame_old = graph.frame
-	}
+    graph.frame++
+    last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0
+    ticks := f64(graph.second_sw.elapsed().microseconds())/1000.0
+    if ticks > 999.0 {
+        fps := f64(graph.frame - graph.frame_old)*ticks/1000.0
+        eprintln('fps: ${fps:5.1f} | last frame took: ${last_frame_ms:6.3f}ms | frame: ${graph.frame:6} ')
+        graph.second_sw.restart()
+        graph.frame_old = graph.frame
+    }
 }
 
 //  
 fn frame (mut graph Graph) {
     //  follow line need for text drawin'
-	graph.ft.flush()
+    graph.ft.flush()
 
-	graph.gg.begin()
+    graph.gg.begin()
       graph.draw_piccells()
-	  graph.draw_texts()
-	graph.gg.end()
+      graph.draw_texts()
+    graph.gg.end()
 }
 
 //  
 fn (mut graph Graph) run() {
-	for {
-		graph.showfps()
-		//glfw.post_empty_event() // Refresh
-		time.sleep_ms(17) // 60fps
-	}
+    for {
+        graph.showfps()
+        //glfw.post_empty_event() // Refresh
+        time.sleep_ms(17) // 60fps
+    }
 }
 
 //  
@@ -210,11 +210,10 @@ fn (g &Graph) draw_piccells() {
 
 //
 fn (mut g Graph) draw_texts() {
-	if g.font_loaded {
-
-		g.ft.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
-//		println('drawin\' text')
-	}
+    if g.font_loaded {
+        g.ft.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
+//        println('drawin\' text')
+    }
 }
 
 // cell array generates
@@ -232,8 +231,8 @@ fn (mut g Graph) generate() {
 
     for cnt < iter_count {
         cnt++
-        // C.RAND_MAX means RAND_MAX in C
-        r := f64(rand.next(C.RAND_MAX)) / C.RAND_MAX
+        // new random API
+        r := rand.f64()
         if r < 0.01 {
             x = 0.0
             y = 0.16 * py
@@ -262,24 +261,24 @@ fn (mut g Graph) generate() {
 
 //  キーイベント捕捉 ?
 fn on_event(e &sapp.Event, mut graph Graph) {
-	//println('code=$e.char_code')
-	if e.typ == .key_down {
-		graph.key_down(e.key_code)
-	}
+    //println('code=$e.char_code')
+    if e.typ == .key_down {
+        graph.key_down(e.key_code)
+    }
 }
 
 
 fn (mut graph Graph) key_down(key sapp.KeyCode) {
-	// global keys
-	match key {
-		.escape {
-		    println('ESC key pressed ... quit')
-			exit(0)
-		}
-		.q {
+    // global keys
+    match key {
+        .escape {
+            println('ESC key pressed ... quit')
+            exit(0)
+        }
+        .q {
            println('\'q\' pressed for ... quit')
            exit(0)
-		}
-		else {}
-	}
+        }
+        else {}
+    }
 }
