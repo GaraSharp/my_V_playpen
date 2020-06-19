@@ -11,7 +11,7 @@ import rand
 import time
 import gx 
 //import gl
-import gg
+import oldgg as gg
 import glfw
 import math
 import math.complex as cmplx
