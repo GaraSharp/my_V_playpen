@@ -1,56 +1,22 @@
-/* 
- * title : g_frame.v - new graphix code template
- * begin : 2020-06-08 14:08:59 
- * base  : bounce.v, tetris.v
- * build : v run g_frame.v
- *       : or (newer Xcode)
- *       : v -cflags ' -Xlinker -U -Xlinker _objc_loadClassref ' run g_frame.v 
- * cf.   : https://github.com/vlang/v/issues/5069
- * 
- */
+// title : Shida_no_Ha.v
+// begin : 2019-09-06 21:38:31
+// note  : draw シダの葉 in V
+// base  : biomorph.v
 
-// Copyright (c) 2019-2020 Alexander Medvednikov. All rights reserved.
+// Copyright (c) 2019 Alexander Medvednikov. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
 
-// need ? DK ...
-// module main
-
-import os
-import gx
-import gg
-import gg.ft
 import rand
 import time
-import sokol.sapp  // for key handlin'
 import term
-
-
-struct Graph {
-mut:
-    // graphics pic-cell array
-    cells       [][]int
-
-    gg       &gg.Context
-    x        int
-    y        int
-    dy       int
-    dx       int
-    height   int
-    width    int
-    draw_fn  voidptr
-
-    // ft context for font drawing
-    ft          &ft.FT = voidptr(0)
-    font_loaded bool
-
-    // frame/time counters for showfps()
-    frame int
-    frame_old int
-    frame_sw  time.StopWatch = time.new_stopwatch({})
-    second_sw time.StopWatch = time.new_stopwatch({})
-
-}
+//import strings
+import gx
+//import gl
+import oldgg as gg
+import glfw
+import freetype
+import os
 
 const (
 // Window coords
@@ -58,39 +24,40 @@ const (
     x_max =  3.0
     y_min = -0.5
     y_max = 11.0
-    block_size    = 3
-    window_width  = 1150
-    window_height = 600
-    width = 50
+    block_size   = 2
+    win_width    = 1150 // window size
+    win_height   = 600
+    text_colour  = gx.rgb(3, 3, 3)
     leaf_colour  = gx.rgb(10, 100, 10)
-    //  this case's maximum count
-    //  I don't know why, but sokol lib allocates graphix obj numbers
-    //  may fixed, I think ... 
-    //  any idea ? thanks !
-    iter_count   = 12249
+    bak_colour   = gx.rgb(240, 240, 240)
+    font_size    = 30
+    iter_count   = 500000
+    timer_period = 500   // ms
 )
 
-//  font contexts
 const (
     text_cfg = gx.TextCfg {
-        align:gx.align_left
-        size:10
-//        color:gx.black
-        color:gx.rgb(0, 0, 0)
-    }
-    lett_cfg = gx.TextCfg {
-        align:gx.align_left
-        size:width
-        color:gx.green
-//        color:gx.rgb(0, 0, 0)
+        align: gx.align_left
+        size:  font_size
+        color: text_colour
     }
 )
+// Fern graphics canvas
+struct Graph {
+mut:
+    // graphics pic-cell array
+    cells       [][]int
+    // gg context for drawing
+    gg          &gg.GG
+    // ft context for font drawing
+    ft          &freetype.FreeType
+    font_loaded bool
+}
 
-
-//  font file loading
-fn alloc_font(mut graph Graph){
-    //  font file locations for several env ...
-    fpath := [
+fn main() {
+    // search font places
+    // Ubuntu (system wide), Arch (user side), etc ...  
+    fils := [
         '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', 
         os.getenv('HOME')+'/.local/share/fonts/NotoSansCJKjp-Regular.otf' ,
         os.getenv('HOME')+'/Library/Fonts/NotoSansCJKjp-Regular.otf',
@@ -101,7 +68,7 @@ fn alloc_font(mut graph Graph){
 
     //  font searching
     mut jp_font := ''
-    for f in fpath {
+    for f in fils {
         stat := os.exists(f)
         match stat {
           true {
@@ -116,105 +83,80 @@ fn alloc_font(mut graph Graph){
         
         if stat { 
             jp_font = f
-            println('Get font file Nooooow !')
+            println('Get font file Nooow !')
             break 
         }
     }
 
-    println('ready for action in new graphix handling ...')
+    glfw.init_glfw() // change on 2019-10-12 19:49:38
 
-    x := ft.new({ font_path: jp_font, scale: sapp.dpi_scale() }) or {panic(err)}
-    println('loadin fonts')
-    graph.ft = x
-    graph.font_loaded = true
-}
-
-//  
-fn main() {
-    mut graph := &Graph {
-        gg: 0  // place holdre for graphix context
-        dx: 2
-        dy: 2
-        height: window_height
-        width:  window_width
-        draw_fn: 0
+    // new way to set graphics structure on 0.1.26
+    gconfig := gg.Cfg {
+            width: win_width
+            height: win_height
+            use_ortho: true // This is needed for 2D drawing
+            create_window: true
+            window_title: 'Iterative Fern graphics with V'
     }
-    graph.gg = gg.new_context({
-        width: window_width
-        height: window_height
-//        font_size: 12
+
+    fconfig := gg.Cfg{
+            width: win_width
+            height: win_height
+            use_ortho: true
+            font_path: jp_font
+//            font_size: 18
+            scale: 2
+            window_user_ptr: 0
+    }
+
+    mut graph := &Graph {
+        gg: gg.new_context(gconfig)
+        ft: freetype.new_context(fconfig)
+    }
+
+    println('window size : $win_width x $win_height')
+
+    graph.gg.window.onkeydown(key_down) // MEMO : key event set
+    // Try to load font
+    graph.ft = freetype.new_context(gg.Cfg{
+        font_path: jp_font
+        width:  win_width
+        height: win_height
         use_ortho: true
-        user_data: graph
-        window_title: 'Iterative Fern graphics with V new graphix handling.'
-        create_window: true
-        frame_fn: frame
-        init_fn:  alloc_font
-        event_fn: on_event
-        bg_color: gx.white
+        font_size: font_size
+        scale: 2
     })
 
+    graph.font_loaded = (graph.ft != 0)
     graph.generate()
+    go graph.run() // Run the graph loop in a new thread
 
-    println('Starting the graph loop...')
-    // main graphix obj placing thread .
-    go graph.run()
-    //  gg.run() calls frame_fn (and maybe calls event_fn )
-    graph.gg.run()
-}
-
-//  frame rate (fps) and some info reports
-//  this feature activate with commenting out follow line.
-[if showfps]
-fn (graph &Graph) showfps() {
-    graph.frame++
-    last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0
-    ticks := f64(graph.second_sw.elapsed().microseconds())/1000.0
-    if ticks > 999.0 {
-        fps := f64(graph.frame - graph.frame_old)*ticks/1000.0
-        eprintln('fps: ${fps:5.1f} | last frame took: ${last_frame_ms:6.3f}ms | frame: ${graph.frame:6} ')
-        graph.second_sw.restart()
-        graph.frame_old = graph.frame
+    //  for double buffer like behaviour ...
+    for _ in 0..2 {
+        gg.clear(bak_colour)
+        graph.draw_scene()
+        graph.gg.render()
     }
-}
-
-//  
-fn frame (mut graph Graph) {
-    //  follow line need for text drawin'
-    graph.ft.flush()
-
-    graph.gg.begin()
-      graph.draw_piccells()
-      graph.draw_texts()
-    graph.gg.end()
-}
-
-//  
-fn (mut graph Graph) run() {
+    // MEMO : main loop ; Window Realize, Map, and Quit
     for {
-        graph.showfps()
-        //glfw.post_empty_event() // Refresh
-        time.sleep_ms(17) // 60fps
-    }
-}
-
-//  
-fn (g &Graph) draw_piccells() {
-    for j in 0..window_height {
-        for i  in 0..window_width {
-            if g.cells[i][j] == 1 {
-                g.gg.draw_rect(f32(i), f32(j), block_size-1, block_size-1, leaf_colour)
-            }
+        //  this code does not need redraw new graphix,
+        //  so, render() for key event and flip double buffer ... ?
+        // render() で画像表示とイベント待ち。らしい ?
+        graph.gg.render()
+        if graph.gg.window.should_close() {
+            graph.gg.window.destroy()
+            return
         }
+        time.sleep_ms(timer_period)
+//        println('Sleep !')
     }
 }
 
-//
-fn (mut g Graph) draw_texts() {
-    if g.font_loaded {
-        g.ft.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
-//        println('drawin\' text')
-    }
-}
+//  no used ...
+//fn (g &Graph) init_graph() {
+//    rand.seed(time.now().unix)
+//    rand.seed(int(time.now().unix))
+//}
 
 // cell array generates
 fn (mut g Graph) generate() {
@@ -225,13 +167,13 @@ fn (mut g Graph) generate() {
     mut cnt := 0
     print('generate, ')
     // initialize cell space
-    for _ in 0..window_width {
-        g.cells << [0].repeat(window_height)
+    for _ in 0..win_width {
+        g.cells << [0].repeat(win_height)
     }
 
     for cnt < iter_count {
         cnt++
-        // new random API
+        // 
         r := rand.f64()
         if r < 0.01 {
             x = 0.0
@@ -251,34 +193,67 @@ fn (mut g Graph) generate() {
         }
         px, py = x, y
         /*  set pic-cell colour on  */
-        i := int((py - y_min) / (y_max - y_min) * window_width)
-        j := window_height - int((x_max - px) / (x_max - x_min) * window_height)
+        i := int((py - y_min) / (y_max - y_min) * win_width)
+        j := win_height - int((x_max - px) / (x_max - x_min) * win_height)
         g.cells[i][j] = 1
     }
     println('generated ')
 }
 
-
-//  キーイベント捕捉 ?
-fn on_event(e &sapp.Event, mut graph Graph) {
-    //println('code=$e.char_code')
-    if e.typ == .key_down {
-        graph.key_down(e.key_code)
+// MEMO : main graph loop thread
+fn (g &Graph) run() {
+    for {
+        glfw.post_empty_event() // force window redraw
+        time.sleep_ms(timer_period)
     }
 }
 
-
-fn (mut graph Graph) key_down(key sapp.KeyCode) {
-    // global keys
-    match key {
-        .escape {
-            println('ESC key pressed ... quit')
-            exit(0)
+fn (g &Graph) draw_curve() {
+    for j in 0..win_height {
+        for i  in 0..win_width {
+            if g.cells[i][j] == 1 {
+                g.gg.draw_rect(f32(i), f32(j), block_size-1, block_size-1, leaf_colour)
+            }
         }
-        .q {
-           println('\'q\' pressed for ... quit')
-           exit(0)
+    }
+}
+
+fn (mut g Graph) draw_message() {
+    if g.font_loaded {
+        g.ft.draw_text(100, 50, 'シダの葉グラフィクス', text_cfg)
+    }
+}
+
+fn (mut g Graph) draw_scene() {
+    gg.clear(bak_colour)
+    g.draw_curve()
+    g.draw_message()
+}
+
+// 以下のkey_down() では、キー入力で、ESCキーの場合に
+// glfw.set_should_close を true にする、らしい
+// TODO: this exposes the unsafe C interface, clean up
+fn key_down(wnd voidptr, key, code, action, mods int) {
+    println('key_down()')
+    // debug ; println('action = $action')
+    // action : key-in=1, key-release=0, key-repeat=2
+    // so, follow line is キーリピートでもなく、キー押下でもない、
+    // キー・リリースの場合には[戻る]、ということらしい
+    if action != 2 && action != 1 {
+        return
+    }
+
+    // Fetch the game object stored in the user pointer
+//    mut graph := &Graph(glfw.get_window_user_pointer(wnd))
+
+    // Fetch the graph object stored in the user pointer
+    match key {
+        (glfw.key_escape) {  // parsing problem ? need parenthesis to embed key code
+            // case GLFW_KEy_ESCAPE:
+            glfw.set_should_close(wnd, true)
+            println('ESC key detections')
         }
         else {}
     }
 }
+
