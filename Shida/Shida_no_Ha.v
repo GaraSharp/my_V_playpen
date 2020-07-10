@@ -19,7 +19,7 @@
 import os
 import gx
 import gg
-import gg.ft
+//import gg.ft
 import rand
 import time
 import sokol.sapp  // for key handlin'
@@ -41,8 +41,8 @@ mut:
     draw_fn  voidptr
 
     // ft context for font drawing
-    ft          &ft.FT = voidptr(0)
-    font_loaded bool
+//    ft          &ft.FT = voidptr(0)
+//    font_loaded bool
 
     // frame/time counters for showfps()
     frame int
@@ -67,30 +67,12 @@ const (
     //  I don't know why, but sokol lib allocates graphix obj numbers
     //  may fixed, I think ... 
     //  any idea ? thanks !
-    iter_count   = 12249
+    iter_count   = 12300
 )
 
-//  font contexts
+//  font file locations for several env ...
 const (
-    text_cfg = gx.TextCfg {
-        align:gx.align_left
-        size:10
-//        color:gx.black
-        color:gx.rgb(0, 0, 0)
-    }
-    lett_cfg = gx.TextCfg {
-        align:gx.align_left
-        size:width
-        color:gx.green
-//        color:gx.rgb(0, 0, 0)
-    }
-)
-
-
-//  font file loading
-fn alloc_font(mut graph Graph){
-    //  font file locations for several env ...
-    fpath := [
+   font_files = [
         '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', 
         os.getenv('HOME')+'/.local/share/fonts/NotoSansCJKjp-Regular.otf' ,
         os.getenv('HOME')+'/Library/Fonts/NotoSansCJKjp-Regular.otf',
@@ -98,9 +80,32 @@ fn alloc_font(mut graph Graph){
         'NotoSansCJKjp-Regular.otf' ,
         'DroidSerif-Regular.ttf',
     ]
+)
+
+//  font contexts
+const (
+    text_cfg = gx.TextCfg {
+        align:gx.align_left
+        size:16
+//        color:gx.black
+        color:gx.rgb(0, 0, 0)
+    }
+
+)
+
+//  font file loading
+fn alloc_font() string {
+    //  font file locations for several env ...
+    fpath := font_files
 
     //  font searching
-    mut jp_font := ''
+    mut jp_font := os.getenv('VUI_FONT')
+
+    if jp_font != '' { 
+        println('font file $jp_font from env VUI_FONT')
+        return jp_font 
+    }
+
     for f in fpath {
         stat := os.exists(f)
         match stat {
@@ -121,16 +126,17 @@ fn alloc_font(mut graph Graph){
         }
     }
 
-    println('ready for action in new graphix handling ...')
+//    println('loadin fonts as ${graph.gg.config.font_path}')
 
-    x := ft.new({ font_path: jp_font, scale: sapp.dpi_scale() }) or {panic(err)}
-    println('loadin fonts')
-    graph.ft = x
-    graph.font_loaded = true
+    return jp_font
 }
 
 //  
 fn main() {
+    // get font file path
+    // 'cause font allocates when gg context generates.
+    font := alloc_font()
+
     mut graph := &Graph {
         gg: 0  // place holdre for graphix context
         dx: 2
@@ -148,8 +154,9 @@ fn main() {
         window_title: 'Iterative Fern graphics with V new graphix handling.'
         create_window: true
         frame_fn: frame
-        init_fn:  alloc_font
+//        init_fn:  alloc_font
         event_fn: on_event
+        font_path: font
         bg_color: gx.white
     })
 
@@ -180,7 +187,8 @@ fn (graph &Graph) showfps() {
 //  
 fn frame (mut graph Graph) {
     //  follow line need for text drawin'
-    graph.ft.flush()
+    //graph.ft.flush()
+    graph.frame_sw.restart()
 
     graph.gg.begin()
       graph.draw_piccells()
@@ -210,10 +218,8 @@ fn (g &Graph) draw_piccells() {
 
 //
 fn (mut g Graph) draw_texts() {
-    if g.font_loaded {
-        g.ft.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
+    g.gg.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
 //        println('drawin\' text')
-    }
 }
 
 // cell array generates
@@ -231,7 +237,8 @@ fn (mut g Graph) generate() {
 
     for cnt < iter_count {
         cnt++
-        // new random API
+        // C.RAND_MAX means RAND_MAX in C
+        //r := f64(rand.next(C.RAND_MAX)) / C.RAND_MAX
         r := rand.f64()
         if r < 0.01 {
             x = 0.0
