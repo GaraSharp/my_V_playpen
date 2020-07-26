@@ -172,7 +172,7 @@ fn main() {
 //  frame rate (fps) and some info reports
 //  this feature activate with commenting out follow line.
 [if showfps]
-fn (graph &Graph) showfps() {
+fn (mut graph Graph) showfps() {
     graph.frame++
     last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0
     ticks := f64(graph.second_sw.elapsed().microseconds())/1000.0
