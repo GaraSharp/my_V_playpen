@@ -18,7 +18,7 @@ import ui
 
 const (
     win_width = 300
-    win_height = 50
+    win_height = 55
     font_path  = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 )
 
@@ -69,14 +69,14 @@ fn main() {
 }
 
 //  button callback
-fn btn_count_click(mut app &App, btn &ui.Button) {
+fn btn_count_click(mut app &App, mut btn &ui.Button) {
     app.counter = (app.counter.int() - 1).str()
-    if btn.text == 'Quit' {
+    if btn.text == '   Quit' {
       println('Just quit this client ... thanks !')
       exit(0)
     }
     btn.text = '${app.counter.int()}  回、押して'
     if app.counter.int() <= 0 {
-      btn.text = 'Quit'
+      btn.text = '   Quit'
     }
 }
