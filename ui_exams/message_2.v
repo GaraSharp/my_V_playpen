@@ -3,11 +3,12 @@
  * begin : 2020-06-25 04:26:32 
  * note  : dialog box with button callback and event loops
  *       : 
- *       : this client includes Japanese character string,
+ *       : this code includes Japanese character string,
  *       : so, works with environment variable 'VUI_FONT'
  *       : to set Japanese font file like as follows :
- *       :   ex. export $VUI_FONT = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
- *       : 
+ *       :   ex. export $VUI_FONT=~/.local/share/fonts/NotoSans-Regular.ttf
+ *       :     or
+ *       :   ex. VUI_FONT=~/.local/share/fonts/NotoSans-Regular.ttf v run message_2.v
  *       : 
  *       : 
  */
@@ -19,7 +20,8 @@ import ui
 const (
     win_width = 300
     win_height = 55
-    font_path  = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
+    //  currently ttc (truetype collection font) is not avaioable in v
+//    font_path  = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
 )
 
 struct App {
@@ -30,8 +32,7 @@ mut:
 
 fn main() {
 
-//  setenv(name, value string, overwrite bool)
-   os.setenv('VUI_FONT', font_path, true)
+//   os.setenv('VUI_FONT', font_path, true)
 
     mut app := &App{
         window: 0
