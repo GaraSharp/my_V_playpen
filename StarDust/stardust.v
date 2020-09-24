@@ -27,9 +27,9 @@ import rand
 struct Graph {
 mut:
     gg       &gg.Context
-    x        []int    //  stars coords
-    y        []int
-    z        []int
+    x        []f32    //  stars coords
+    y        []f32
+    z        []f32
     height   int
     width    int
     draw_fn  voidptr
@@ -96,9 +96,9 @@ fn main() {
 
     //  
     for _ in 0..stars {
-        graph.x << rand.int_in_range(-5000, 5000)
-        graph.y << rand.int_in_range(-5000, 5000)
-        graph.z << rand.int_in_range(400, 10000)
+        graph.x << rand.f32_in_range(-5000, 5000)
+        graph.y << rand.f32_in_range(-5000, 5000)
+        graph.z << rand.f32_in_range(400, 10000)
     }
 
     println('Starting the graph loop...')
@@ -144,8 +144,8 @@ fn frame (mut graph Graph) {
 fn (mut graph Graph) update_model() {
 
     for c in 0..stars {
-      graph.z[c] = graph.z[c] - 10
-      if graph.z[c] <= 0 {
+      graph.z[c] = graph.z[c] - 20
+      if graph.z[c] <= 1 {
         graph.x[c] = rand.int_in_range(-5000, 5000)
         graph.y[c] = rand.int_in_range(-5000, 5000)
         graph.z[c] = 10000
