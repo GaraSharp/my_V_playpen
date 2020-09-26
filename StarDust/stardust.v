@@ -89,7 +89,7 @@ fn main() {
         event_fn: on_event
         font_path: font
         bg_color: gx.black
-        fullscreen: true
+//        fullscreen: true  // set window_with, window_height as screen size
     })
     
     //  is VUI_FONT set ? for message selecting
