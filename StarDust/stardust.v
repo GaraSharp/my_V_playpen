@@ -47,10 +47,14 @@ mut:
 
 //  window parameters
 const (
-    window_width  = 1350
-    window_height =  730
-    window_depth  =  400
-    stars  = 500  //  allocate stars
+    window_width  =  1920  //  set screen pixel for fullscreen
+    window_height =  1280  //  set screen pixel for fullscreen
+    window_depth  =   400  //  (as you like)
+    space_width   = 20000  //  
+    space_height  = 20000
+    space_depth   = 10000
+    
+    stars  = 1000  //  allocate stars
 )
 
 //  font contexts
@@ -85,6 +89,7 @@ fn main() {
         event_fn: on_event
         font_path: font
         bg_color: gx.black
+        fullscreen: true
     })
     
     //  is VUI_FONT set ? for message selecting
@@ -96,9 +101,9 @@ fn main() {
 
     //  
     for _ in 0..stars {
-        graph.x << rand.f32_in_range(-5000, 5000)
-        graph.y << rand.f32_in_range(-5000, 5000)
-        graph.z << rand.f32_in_range(400, 10000)
+        graph.x << rand.f32_in_range(-space_width /2, space_width /2)
+        graph.y << rand.f32_in_range(-space_height/2, space_height/2)
+        graph.z << rand.f32_in_range(window_depth, space_depth)
     }
 
     println('Starting the graph loop...')
@@ -146,9 +151,9 @@ fn (mut graph Graph) update_model() {
     for c in 0..stars {
       graph.z[c] = graph.z[c] - 20
       if graph.z[c] <= 1 {
-        graph.x[c] = rand.int_in_range(-5000, 5000)
-        graph.y[c] = rand.int_in_range(-5000, 5000)
-        graph.z[c] = 10000
+        graph.x[c] = rand.f32_in_range(-space_width /2, space_width /2)
+        graph.y[c] = rand.f32_in_range(-space_height/2, space_height/2)
+        graph.z[c] = space_depth
       }
     }
 
