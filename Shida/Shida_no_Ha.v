@@ -96,7 +96,7 @@ const (
 //  font file loading
 fn alloc_font() string {
     //  font file locations for several env ...
-    fpath := font_files
+    fpath := font_files.clone()
 
     //  font searching
     mut jp_font := os.getenv('VUI_FONT')
@@ -115,7 +115,8 @@ fn alloc_font() string {
           false {
             print(term.fail_message('[FAIL]'))
           }
-          else { }
+//          on 0.2.1, empty else caluse in match struct is not necessary.
+//          else { }
         }
         println(' $f')
         
