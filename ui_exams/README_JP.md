@@ -31,3 +31,9 @@ v ui では、環境変数 VUI_FONT によって示されるフォントを利�
 
 いじょう。
 
+
+
+revision historica ; 
+
+2021-01-06 21:20
+message_2.v で、import os は「へびの足」なので、削除しましたヨ。
