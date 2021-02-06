@@ -56,7 +56,7 @@ fn linearrelationship(independent_variable []f64, dependent_variable []f64) Line
 fn main() {
 
     //  read datas from file
-    f_data := os.read_lines(data_file) or { panic('File $data_file ist nicht existen.') }
+    f_data := os.read_lines(data_file) or { panic('File $data_file ist existen nicht .') }
 
     //  compose data to array
     datum := f_data.map(it.split_by_whitespace())

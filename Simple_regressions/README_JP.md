@@ -24,3 +24,7 @@ v simple_liner_regression.v ; ./simple_liner_regression
 
 として頂戴 !
 
+修正履歴
+
+2021-02-07  メッセージを一部修正
+
