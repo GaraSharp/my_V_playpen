@@ -31,8 +31,8 @@ fn main() {
 //			alignment: .top
 			spacing: 5
 			stretch: true
-//			margin: ui.MarginConfig{5,5,5,5}
-			margin: {top:10,left:10,right:10,bottom:10}
+			margin: ui.Margin{5,5,5,5}
+//			margin: {top:10,left:10,right:10,bottom:10}
 		}, [
 			ui.button(
 				width:  10
@@ -60,5 +60,4 @@ fn btn_count_click(mut app App, mut btn &ui.Button) {
     exit(0)
   }
 }
-
 
