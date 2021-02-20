@@ -9,7 +9,7 @@
  * 
  */
 
-// Copyright (c) 2019-2020 Alexander Medvednikov. All rights reserved.
+// Copyright (c) 2019-2021 Alexander Medvednikov. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
 
@@ -20,7 +20,7 @@ import os
 import gx
 import gg
 import time
-import sokol.sapp  // for key handlin'
+//import sokol.sapp  // for key handlin'
 import rand
 
 
@@ -86,10 +86,10 @@ fn main() {
         window_title: 'Stardust.v - Graphix app example'
         create_window: true
         frame_fn: frame
-        event_fn: on_event
+        keydown_fn: on_keydown
         font_path: font
         bg_color: gx.black
-//        fullscreen: true  // set window_with, window_height as screen size
+        fullscreen: true  // set window_with, window_height as screen size
     })
     
     //  is VUI_FONT set ? for message selecting
@@ -178,15 +178,10 @@ fn (mut g Graph) draw_texts() {
 }
 
 //  event handler ?
-fn on_event(e &sapp.Event, mut graph Graph) {
-    //println('code=$e.char_code')
-    if e.typ == .key_down {
-        graph.key_down(e.key_code)
-    }
-}
+
 
 //  key branching
-fn (mut graph Graph) key_down(key sapp.KeyCode) {
+fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut graph Graph) {
     // global keys
     match key {
         .escape {

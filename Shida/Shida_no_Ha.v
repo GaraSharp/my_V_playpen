@@ -1,15 +1,11 @@
 /* 
- * title : g_frame.v - new graphix code template
+ * title : Shida_no_Ha.v - new graphix code template
  * begin : 2020-06-08 14:08:59 
- * base  : bounce.v, tetris.v
- * build : v run g_frame.v
- *       : or (newer Xcode)
- *       : v -cflags ' -Xlinker -U -Xlinker _objc_loadClassref ' run g_frame.v 
- * cf.   : https://github.com/vlang/v/issues/5069
+ * build : v run Shida_no_Ha.v
  * 
  */
 
-// Copyright (c) 2019-2020 Alexander Medvednikov. All rights reserved.
+// Copyright (c) 2019-2021 Alexander Medvednikov. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
 
@@ -22,7 +18,7 @@ import gg
 //import gg.ft
 import rand
 import time
-import sokol.sapp  // for key handlin'
+//import sokol.sapp  // for key handlin'
 import term
 
 
@@ -39,10 +35,6 @@ mut:
     height   int
     width    int
     draw_fn  voidptr
-
-    // ft context for font drawing
-//    ft          &ft.FT = voidptr(0)
-//    font_loaded bool
 
     // frame/time counters for showfps()
     frame int
@@ -71,12 +63,13 @@ const (
 )
 
 //  font file locations for several env ...
+//  truetype collection font is not for use.
 const (
    font_files = [
-        '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', 
+//        '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', 
         os.getenv('HOME')+'/.local/share/fonts/NotoSansCJKjp-Regular.otf' ,
         os.getenv('HOME')+'/Library/Fonts/NotoSansCJKjp-Regular.otf',
-        '/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc' ,
+//        '/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc' ,
         'NotoSansCJKjp-Regular.otf' ,
         'DroidSerif-Regular.ttf',
     ]
@@ -155,8 +148,7 @@ fn main() {
         window_title: 'Iterative Fern graphics with V new graphix handling.'
         create_window: true
         frame_fn: frame
-//        init_fn:  alloc_font
-        event_fn: on_event
+		keydown_fn: on_keydown
         font_path: font
         bg_color: gx.white
     })
@@ -266,17 +258,10 @@ fn (mut g Graph) generate() {
     println('generated ')
 }
 
-
 //  キーイベント捕捉 ?
-fn on_event(e &sapp.Event, mut graph Graph) {
-    //println('code=$e.char_code')
-    if e.typ == .key_down {
-        graph.key_down(e.key_code)
-    }
-}
 
-
-fn (mut graph Graph) key_down(key sapp.KeyCode) {
+// events
+fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut graph Graph) {
     // global keys
     match key {
         .escape {
