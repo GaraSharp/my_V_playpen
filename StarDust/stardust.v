@@ -164,7 +164,8 @@ fn (mut graph Graph) run() {
     for {
         graph.update_model()
         graph.showfps()
-        time.sleep_ms(34) // 30fps
+//        time.sleep_ms(34) // 30fps
+        time.wait(34*time.millisecond) // 30fps
     }
 }
 
