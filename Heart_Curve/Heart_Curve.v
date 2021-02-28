@@ -181,7 +181,7 @@ fn (mut graph Graph) run() {
         graph.showfps()
         //glfw.post_empty_event() // Refresh
 //        time.sleep_ms(34) // 30fps
-        time.wait(34*time.millisecond) // 30fps
+        time.sleep(34*time.millisecond) // 30fps
     }
 }
 
