@@ -15,11 +15,8 @@
 import os
 import gx
 import gg
-//import gg.ft
 import rand
 import time
-//import sokol.sapp  // for key handlin'
-import term
 
 
 struct Graph {
@@ -41,6 +38,9 @@ mut:
     frame_old int
     frame_sw  time.StopWatch = time.new_stopwatch({})
     second_sw time.StopWatch = time.new_stopwatch({})
+    
+    //  japanese flag
+    jpn_text  bool
 
 }
 
@@ -59,20 +59,7 @@ const (
     //  I don't know why, but sokol lib allocates graphix obj numbers
     //  may fixed, I think ... 
     //  any idea ? thanks !
-    iter_count   = 12300
-)
-
-//  font file locations for several env ...
-//  truetype collection font is not for use.
-const (
-   font_files = [
-//        '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', 
-        os.getenv('HOME')+'/.local/share/fonts/NotoSansCJKjp-Regular.otf' ,
-        os.getenv('HOME')+'/Library/Fonts/NotoSansCJKjp-Regular.otf',
-//        '/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc' ,
-        'NotoSansCJKjp-Regular.otf' ,
-        'DroidSerif-Regular.ttf',
-    ]
+    iter_count   = 12000
 )
 
 //  font contexts
@@ -80,49 +67,31 @@ const (
     text_cfg = gx.TextCfg {
         align:gx.align_left
         size:16
-//        color:gx.black
-        color:gx.rgb(0, 0, 0)
+        color:gx.black
     }
-
 )
 
 //  font file loading
 fn alloc_font() string {
-    //  font file locations for several env ...
-    fpath := font_files.clone()
-
     //  font searching
-    mut jp_font := os.getenv('VUI_FONT')
-
-    if jp_font != '' { 
-        println('font file $jp_font from env VUI_FONT')
-        return jp_font 
+    //  first,  check VUI_FONT env vars.
+    mut font_path := os.getenv('VUI_FONT')
+    if font_path != '' { 
+        println('font file $font_path from env VUI_FONT')
+        return font_path 
     }
 
-    for f in fpath {
-        stat := os.exists(f)
-        match stat {
-          true {
-            print(term.ok_message  ('[ OK ]'))
-          }
-          false {
-            print(term.fail_message('[FAIL]'))
-          }
-//          on 0.2.1, empty else caluse in match struct is not necessary.
-//          else { }
-        }
-        println(' $f')
-        
-        if stat { 
-            jp_font = f
-            println('Get font file Nooooow !')
-            break 
-        }
+    //  second, check assets/fonts/RobotoMono-regular.ttf font
+	mut path_finder := os.join_path('.', 'assets', 'fonts', 'RobotoMono-Regular.ttf')
+	font_path = os.resource_abs_path(path_finder)
+    if os.exists_in_system_path(font_path) {
+        println('font path ; $path_finder')
+        println('resource_abs ; $font_path')
+        return font_path
     }
 
-//    println('loadin fonts as ${graph.gg.config.font_path}')
-
-    return jp_font
+    //  finale, trust system ... (which called in Japanese, Maru-nage)
+    return ''
 }
 
 //  
@@ -138,11 +107,11 @@ fn main() {
         height: window_height
         width:  window_width
         draw_fn: 0
+        jpn_text: false
     }
     graph.gg = gg.new_context({
         width: window_width
         height: window_height
-//        font_size: 12
         use_ortho: true
         user_data: graph
         window_title: 'Iterative Fern graphics with V new graphix handling.'
@@ -152,6 +121,14 @@ fn main() {
         font_path: font
         bg_color: gx.white
     })
+
+    //  check japanese text display
+$if jpn ? {
+        graph.jpn_text = true
+}
+    if os.getenv('VUI_FONT') != '' {
+        graph.jpn_text = true
+    }
 
     graph.generate()
 
@@ -163,8 +140,6 @@ fn main() {
 }
 
 //  frame rate (fps) and some info reports
-//  this feature activate with commenting out follow line.
-[if showfps]
 fn (mut graph Graph) showfps() {
     graph.frame++
     last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0
@@ -179,10 +154,6 @@ fn (mut graph Graph) showfps() {
 
 //  
 fn frame (mut graph Graph) {
-    //  follow line need for text drawin'
-    //graph.ft.flush()
-    graph.frame_sw.restart()
-
     graph.gg.begin()
       graph.draw_piccells()
       graph.draw_texts()
@@ -192,9 +163,10 @@ fn frame (mut graph Graph) {
 //  
 fn (mut graph Graph) run() {
     for {
+//  to activate showfps feature, use -d option like as '-d showfps'
+$if showfps ? {
         graph.showfps()
-        //glfw.post_empty_event() // Refresh
-//        time.sleep_ms(34) // 30fps
+}
         time.sleep(34*time.millisecond) // 30fps
     }
 }
@@ -212,8 +184,12 @@ fn (g &Graph) draw_piccells() {
 
 //
 fn (mut g Graph) draw_texts() {
-    g.gg.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
-//        println('drawin\' text')
+
+    if g.jpn_text {
+        g.gg.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
+    } else {
+    g.gg.draw_text(20, 30, 'Iterative fern graphix (V new Graphix handling)', text_cfg)
+    }
 }
 
 // cell array generates
@@ -231,8 +207,6 @@ fn (mut g Graph) generate() {
 
     for cnt < iter_count {
         cnt++
-        // C.RAND_MAX means RAND_MAX in C
-        //r := f64(rand.next(C.RAND_MAX)) / C.RAND_MAX
         r := rand.f64()
         if r < 0.01 {
             x = 0.0
@@ -259,9 +233,7 @@ fn (mut g Graph) generate() {
     println('generated ')
 }
 
-//  キーイベント捕捉 ?
-
-// events
+//  key events
 fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut graph Graph) {
     // global keys
     match key {

@@ -20,25 +20,28 @@ https://ja.wikipedia.org/wiki/%E5%8F%8D%E5%BE%A9%E9%96%A2%E6%95%B0%E7%B3%BB
 ~~そこで、手元にダウンロードしておいた「源ノ角ゴシック (Source Han Sans JP Medium) フォント」をRobotoMono-Regular.ttfとリネームして使ってみました。~~
 ~~他の日本語フォントでも表示できると思います。​~~
 
-Arch Linuxでは、標準の日本語フォントがないので、以下からダウンロードしたフォント「NotoSansCJKjp-Regular.otf」を利用しております。
+~~Arch Linuxでは、標準の日本語フォントがないので、以下からダウンロードしたフォント「NotoSansCJKjp-Regular.otf」を利用しております。~~
 
-noto-cjk/NotoSansCJKjp-Regular.otf 
-https://github.com/googlefonts/noto-cjk/blob/master/NotoSansCJKjp-Regular.otf
+~~noto-cjk/NotoSansCJKjp-Regular.otf~~ 
+~~https://github.com/googlefonts/noto-cjk/blob/master/NotoSansCJKjp-Regular.otf~~
 
-ユーザーサイドにフォントを導入すると、~/.local/share/fonts/ に導入されるので、Archではここを参照しております。
+~~ユーザーサイドにフォントを導入すると、~/.local/share/fonts/ に導入されるので、Archではここを参照しております。~~
 
-Ubuntuでは、標準でNotoフォントが利用できるので、/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc として参照しております。
+~~Ubuntuでは、標準でNotoフォントが利用できるので、/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc として参照しております。~~
 
-他のOSの場合、ソースコードと同じディレクトリにあろう、次のフォントを参照するようにしております。
+~~他のOSの場合、ソースコードと同じディレクトリにあろう、次のフォントを参照するようにしております。~~
 
-+ 'NotoSansCJKjp-Regular.otf' ,
-+ 'DroidSerif-Regular.ttf',
++ ~~'NotoSansCJKjp-Regular.otf' ,~~
++ ~~'DroidSerif-Regular.ttf',~~
 
-「DroidSerif-Regular.ttf」には日本語が入っていないので、何も表示されません。あしからず。
+~~「DroidSerif-Regular.ttf」には日本語が入っていないので、何も表示されません。あしからず。~~
 
 これまでは、決め打ちでフォントpathを書いておりましたが、環境変数 VUI_FONT にフォントpathを設定しておくと、そのフォントファイルを使用する風に書き加えました。
 
 revision histrica : 
+
+2021-04-25
+フォントファイル指定方式を変更しています。まだ、着地点に至らず。
 
 2021-01-06 03:13:01
 v 0.2.1で、match文の中のelse節が空白にの場合には、else節が不要になったという変更があったので、軽微な修正を。
