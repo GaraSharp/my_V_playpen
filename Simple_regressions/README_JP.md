@@ -28,3 +28,5 @@ v simple_liner_regression.v ; ./simple_liner_regression
 
 2021-02-07  メッセージを一部修正
 
+2021-08-01 split_by_whitespace() メソッドが使えなくなっていたので、苦し紛れの変更
+

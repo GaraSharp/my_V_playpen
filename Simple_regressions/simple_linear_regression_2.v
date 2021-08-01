@@ -56,14 +56,24 @@ fn linearrelationship(independent_variable []f64, dependent_variable []f64) Line
 fn main() {
 
     //  read datas from file
-    f_data := os.read_lines(data_file) or { panic('File $data_file ist existen nicht .') }
+    f_data := os.read_lines(data_file) or { panic('File $data_file ist nicht existen.') }
 
     //  compose data to array
-    datum := f_data.map(it.split_by_whitespace())
-    arry  := datum.map(it.map(it.f64()))
-  
-	independent_variable := arry.map(it[0])
-	dependent_variable   := arry.map(it[1])
+    mut independent_variable := []f64{}
+    mut dependent_variable   := []f64{}
+
+    for item in f_data {
+        dat := item.split(' ')
+        mut s := []f64{}
+        for i in dat {
+            if i != '' { s << i.f64() }
+        }
+        independent_variable << s[0]
+        dependent_variable   << s[1]
+    }
+
+    println('indep  ; $independent_variable')
+    println('depend ; $dependent_variable')
 
 	result := linearrelationship(independent_variable, dependent_variable)
 	println(result)
