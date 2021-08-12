@@ -9,3 +9,8 @@ https://www.huffpost.com/entry/google-heart-graph-valentines-day_n_1276391
 
 Vでも複素数の計算が出来ますが、少々メンドウです。コードをみてやってくださいな。
 
+Revision historica : 
+
+2021-08-16
+’error: cannot initialize a struct with a map' となるので、軽微な修正
+
