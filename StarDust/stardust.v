@@ -40,8 +40,8 @@ mut:
     // frame/time counters for showfps()
     frame int
     frame_old int
-    frame_sw  time.StopWatch = time.new_stopwatch({})
-    second_sw time.StopWatch = time.new_stopwatch({})
+    frame_sw  time.StopWatch = time.new_stopwatch()
+    second_sw time.StopWatch = time.new_stopwatch()
 
 }
 
@@ -78,7 +78,7 @@ fn main() {
         width:  window_width
         draw_fn: 0
     }
-    graph.gg = gg.new_context({
+    graph.gg = gg.new_context(
         width:  window_width
         height: window_height
         use_ortho: true
@@ -89,8 +89,9 @@ fn main() {
         keydown_fn: on_keydown
         font_path: font
         bg_color: gx.black
+        resizable: true
         fullscreen: true  // set window_with, window_height as screen size
-    })
+    )
     
     //  is VUI_FONT set ? for message selecting
     graph.vui_font_p = if os.getenv('VUI_FONT') != '' {
@@ -114,7 +115,7 @@ fn main() {
 }
 
 //  frame rate (fps) and some info reports
-//[if showfps]
+[if showfps ?]
 fn (mut graph Graph) showfps() {
     graph.frame++
     last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0
@@ -163,9 +164,14 @@ fn (mut graph Graph) update_model() {
 fn (mut graph Graph) run() {
     for {
         graph.update_model()
+$if showfps ? {
         graph.showfps()
+
+println('$graph.gg.width, $graph.gg.height')
+
+}
 //        time.sleep_ms(34) // 30fps
-        time.wait(34*time.millisecond) // 30fps
+        time.sleep(34*time.millisecond) // 30fps
     }
 }
 
