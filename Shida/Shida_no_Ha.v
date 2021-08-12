@@ -36,8 +36,8 @@ mut:
     // frame/time counters for showfps()
     frame int
     frame_old int
-    frame_sw  time.StopWatch = time.new_stopwatch({})
-    second_sw time.StopWatch = time.new_stopwatch({})
+    frame_sw  time.StopWatch = time.new_stopwatch()
+    second_sw time.StopWatch = time.new_stopwatch()
     
     //  japanese flag
     jpn_text  bool
@@ -109,7 +109,7 @@ fn main() {
         draw_fn: 0
         jpn_text: false
     }
-    graph.gg = gg.new_context({
+    graph.gg = gg.new_context(
         width: window_width
         height: window_height
         use_ortho: true
@@ -120,7 +120,7 @@ fn main() {
 		keydown_fn: on_keydown
         font_path: font
         bg_color: gx.white
-    })
+    )
 
     //  check japanese text display
 $if jpn ? {
@@ -140,6 +140,7 @@ $if jpn ? {
 }
 
 //  frame rate (fps) and some info reports
+[if showfps ?]
 fn (mut graph Graph) showfps() {
     graph.frame++
     last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0
