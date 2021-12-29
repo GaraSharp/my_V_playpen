@@ -136,7 +136,7 @@ fn frame (mut graph Graph) {
     graph.gg.begin()
 
       for c in 0..stars {
-        graph.gg.draw_rect(
+        graph.gg.draw_rect_filled(
           window_width /2 + graph.x[c]*window_depth/graph.z[c], 
           window_height/2 - graph.y[c]*window_depth/graph.z[c], 
           2, 2, gx.white)
