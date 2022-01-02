@@ -14,9 +14,7 @@
 
 import gx
 import gg
-import rand
 import time
-
 
 //  
 const (
@@ -113,7 +111,6 @@ fn (mut graph Graph) showfps() {
 //  
 fn frame (mut graph Graph) {
     //  follow line need for text drawin'
-    //graph.ft.flush()
     graph.frame_sw.restart()
 
     graph.gg.begin()
@@ -148,38 +145,6 @@ fn (mut g Graph) draw_texts() {
 //  place pic-cell on graphix array buffre
 fn (mut g Graph) plot_piccell(i int, j int, colour u32) {
     g.cells[j][i] = colour
-    if i < win_width-1 {
-        g.cells[j][i+1] = colour
-    }
-    if j < win_height-1 {
-        g.cells[j+1][i] = colour
-    }
-    if i < win_width-1 && j < win_height-1 {
-        g.cells[j+1][i+1] = colour
-    }
-}
-
-//  place pic-cell on graphix array buffre
-fn (mut g Graph) plot_piccell_(i int, j int, colour u32) {
-    g.cells[j][i] = colour
-}
-
-
-
-// function draw array generates
-fn (mut g Graph) generate() {
-
-    mut  c := 0
-
-    for j := 0; j < win_height; j++ {
-        for i := 0; i < win_width; i++ {
-            // set piccell on condition
-            g.plot_piccell(i, j, if rand.intn(2) == 0 { u32(gx.black.abgr8()) } else { u32(gx.white.abgr8()) })
-//            g.cells[j][i] = if rand.intn(2) == 0 { colour_black } else { colour_white }
-            c = 1-c
-        }
-    }
-//    println('generated ')
 }
 
 
@@ -187,31 +152,29 @@ fn (mut g Graph) generate() {
 fn (mut g Graph) ant_move() {
 
     if g.cells[g.yp][g.xp] == u32(gx.white.abgr8()) {
-        g.cells[g.yp][g.xp] = u32(gx.black.abgr8())
+        g.plot_piccell(g.xp, g.yp, u32(gx.black.abgr8()))
         g.dir = (g.dir+1) % 4
     } else {
-        g.cells[g.yp][g.xp] = u32(gx.white.abgr8())
+        g.plot_piccell(g.xp, g.yp, u32(gx.white.abgr8()))
         g.dir = (g.dir+3) % 4
     }
     
     match g.dir {
-        0 {
+        0 {  //  NORTH (UP)
           g.yp = (g.yp-1+win_height) % win_height
         }
-        1 {
+        1 {  //  WEST (LEFT)
           g.xp = (g.xp-1+win_width) % win_width
         }
-        2 {
+        2 {  //  SOUTH (DOWN)
           g.yp = (g.yp+1+win_height) % win_height
         }
-        3 {
-          g.xp = (g.xp+1+win_width) % win_width
+        3 {  //  EAST (RIGHT)
+          g.xp = (g.xp+1+win_width)  % win_width
         }
         else { }
     }
 
-//    println('(${g.xp}, ${g.yp}), $g.dir ')
-//    time.sleep(10*time.millisecond)
 }
 
 //  graphix rendering callback for graphix initiate
@@ -219,9 +182,7 @@ fn graphics_init(mut g Graph) {
 	g.istream_idx = g.gg.new_streaming_image(win_width, win_height, pbytes, pixel_format: .rgba8)
 }
 
-
-//  キーイベント捕捉 
-// events
+//  key events handler
 fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut graph Graph) {
     // global keys
     match key {
