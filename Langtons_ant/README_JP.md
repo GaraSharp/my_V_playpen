@@ -8,7 +8,10 @@ https://ja.wikipedia.org/wiki/%E3%83%A9%E3%83%B3%E3%82%B0%E3%83%88%E3%83%B3%E3%8
 ##  lista-manifesto
 
 - langton.v
-  フツーの Langtons'  Antですだよ。いずれ、別のファイルを追加したいなぁ。
+  フツーの Langtons'  Antですだよ。~~いずれ、別のファイルを追加したいなぁ。~~
+- hex_langton.v
+  なんと、疑似Hex board上で展開する Langtons' Antですだよ ! (2022-01-02 追加)
+  端点処理がこなれていないので、長い間動かすと、少々汚くなってしまいます。
 
 ## nota V code
 
@@ -24,4 +27,6 @@ Revision historica :
 
 - 2021-12-29
   first appearance
+- 2022-01-02
+  adds 'hex_langton.v'
 
