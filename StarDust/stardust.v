@@ -17,6 +17,7 @@
 // module main
 
 import os
+import os.font
 import gx
 import gg
 import time
@@ -70,7 +71,8 @@ const (
 fn main() {
     // get font file path
     // 'cause font allocates when gg context generates.
-    font := gg.system_font_path()
+//    font := gg.system_font_path()
+    font := font.default()
 
     mut graph := &Graph {
         gg: 0  // place holdre for graphix context
