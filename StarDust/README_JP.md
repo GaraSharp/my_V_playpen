@@ -45,3 +45,9 @@ gg.system_font_path() では、
 
 いじょう。
 
+### Revision historica
+
++ 2022-02-24
+
+  rand.f32_in_range() が Optionを返す風に変更されたらしく、or { panic(err) } を追加して、Quick Fix
+

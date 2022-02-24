@@ -104,9 +104,9 @@ fn main() {
 
     //  
     for _ in 0..stars {
-        graph.x << rand.f32_in_range(-space_width /2, space_width /2)
-        graph.y << rand.f32_in_range(-space_height/2, space_height/2)
-        graph.z << rand.f32_in_range(window_depth, space_depth)
+        graph.x << rand.f32_in_range(-space_width /2, space_width /2) or { panic(err) }
+        graph.y << rand.f32_in_range(-space_height/2, space_height/2) or { panic(err) }
+        graph.z << rand.f32_in_range(window_depth, space_depth) or { panic(err) }
     }
 
     println('Starting the graph loop...')
@@ -154,8 +154,8 @@ fn (mut graph Graph) update_model() {
     for c in 0..stars {
       graph.z[c] = graph.z[c] - 20
       if graph.z[c] <= 1 {
-        graph.x[c] = rand.f32_in_range(-space_width /2, space_width /2)
-        graph.y[c] = rand.f32_in_range(-space_height/2, space_height/2)
+        graph.x[c] = rand.f32_in_range(-space_width /2, space_width /2) or { panic(err) }
+        graph.y[c] = rand.f32_in_range(-space_height/2, space_height/2) or { panic(err) }
         graph.z[c] = space_depth
       }
     }
