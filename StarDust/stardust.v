@@ -33,6 +33,10 @@ mut:
     z        []f32
     height   int
     width    int
+    
+    mouse_x  int
+    mouse_y  int
+    
     draw_fn  voidptr
 
     font_loaded bool
@@ -48,13 +52,13 @@ mut:
 
 //  window parameters
 const (
-    window_width  =  1920  //  set screen pixel for fullscreen
-    window_height =  1280  //  set screen pixel for fullscreen
-    window_depth  =   400  //  (as you like)
+    window_width  =  960  //  set screen pixel for fullscreen
+    window_height =  540  //  set screen pixel for fullscreen
+    window_depth  =  400  //  (as you like)
     space_width   = 20000  //  
     space_height  = 20000
     space_depth   = 10000
-    
+    frame_rate    = 17     //     
     stars  = 1000  //  allocate stars
 )
 
@@ -70,8 +74,6 @@ const (
 //  
 fn main() {
     // get font file path
-    // 'cause font allocates when gg context generates.
-//    font := gg.system_font_path()
     font := font.default()
 
     mut graph := &Graph {
@@ -88,10 +90,10 @@ fn main() {
         window_title: 'Stardust.v - Graphix app example'
         create_window: true
         frame_fn: frame
+        event_fn: my_event_manager
         keydown_fn: on_keydown
         font_path: font
         bg_color: gx.black
-        resizable: true
         fullscreen: true  // set window_with, window_height as screen size
     )
     
@@ -104,9 +106,9 @@ fn main() {
 
     //  
     for _ in 0..stars {
-        graph.x << rand.f32_in_range(-space_width /2, space_width /2) or { panic(err) }
-        graph.y << rand.f32_in_range(-space_height/2, space_height/2) or { panic(err) }
-        graph.z << rand.f32_in_range(window_depth, space_depth) or { panic(err) }
+        graph.x << rand.f32_in_range(-space_width /2, space_width /2) ?
+        graph.y << rand.f32_in_range(-space_height/2, space_height/2) ?
+        graph.z << rand.f32_in_range(window_depth, space_depth) ?
     }
 
     println('Starting the graph loop...')
@@ -130,19 +132,28 @@ fn (mut graph Graph) showfps() {
     }
 }
 
+//
+// drawing star
+fn (mut graph Graph) draw_star (x f32, y f32, r f32) {
+
+     graph.gg.draw_circle_filled(
+          x, y, r, gx.white)
+}
+
 // Graphix placing
 fn frame (mut graph Graph) {
-
-    graph.frame_sw.restart()
 
     graph.gg.begin()
 
       for c in 0..stars {
-        graph.gg.draw_rect_filled(
+        mut r := f32(window_depth)/graph.z[c]*3
+        if r < 1.05 { r = 1.05 }
+        graph.draw_star(
           window_width /2 + graph.x[c]*window_depth/graph.z[c], 
           window_height/2 - graph.y[c]*window_depth/graph.z[c], 
-          2, 2, gx.white)
+          r)
       }
+
       graph.draw_texts()
 
     graph.gg.end()
@@ -154,8 +165,8 @@ fn (mut graph Graph) update_model() {
     for c in 0..stars {
       graph.z[c] = graph.z[c] - 20
       if graph.z[c] <= 1 {
-        graph.x[c] = rand.f32_in_range(-space_width /2, space_width /2) or { panic(err) }
-        graph.y[c] = rand.f32_in_range(-space_height/2, space_height/2) or { panic(err) }
+        graph.x[c] = rand.f32_in_range(-space_width /2, space_width /2) or { 0.0 }
+        graph.y[c] = rand.f32_in_range(-space_height/2, space_height/2) or { 0.0 }
         graph.z[c] = space_depth
       }
     }
@@ -166,28 +177,31 @@ fn (mut graph Graph) update_model() {
 fn (mut graph Graph) run() {
     for {
         graph.update_model()
-$if showfps ? {
         graph.showfps()
-
-println('$graph.gg.width, $graph.gg.height')
-
-}
 //        time.sleep_ms(34) // 30fps
-        time.sleep(34*time.millisecond) // 30fps
+        time.sleep(frame_rate*time.millisecond) 
     }
 }
 
 //
 fn (mut g Graph) draw_texts() {
     if g.vui_font_p == true {
-        g.gg.draw_text(30, 8, '宇宙 ... それは人類に残された最後の開拓地である', text_cfg)
+//        g.gg.draw_text(30, 28, '宇宙 ... それは人類に残された最後の開拓地である', text_cfg)
+        g.gg.draw_text(30, 28, '人類の冒険は、今、始まったばかりである', text_cfg)
     } else {
-        g.gg.draw_text(30, 8, 'Space ... The final frontier', text_cfg)
+//        g.gg.draw_text(30, 28, 'Space ... The final frontier', text_cfg)
+        g.gg.draw_text(30, 28, 'The human adventure is just beginning', text_cfg)
     }
 }
 
 //  event handler ?
 
+fn my_event_manager(mut ev gg.Event, mut app Graph) {
+        if ev.typ == .mouse_move {
+                app.mouse_x = int(ev.mouse_x)
+                app.mouse_y = int(ev.mouse_y)
+        }
+}
 
 //  key branching
 fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut graph Graph) {
@@ -199,6 +213,10 @@ fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut graph Graph) {
         .q {
            println('q pressed ... quit')
            exit(0)
+        }
+        .space {
+           println('space pressed ... ')
+           println('mouse : $graph.mouse_x, $graph.mouse_y')
         }
         else {}
     }
