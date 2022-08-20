@@ -5,7 +5,7 @@
  * 
  */
 
-// Copyright (c) 2019-2021 Alexander Medvednikov. All rights reserved.
+// Copyright (c) 2019-2022 Alexander Medvednikov. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
 
@@ -13,6 +13,7 @@
 // module main
 
 import os
+import os.font
 import gx
 import gg
 import rand
@@ -39,8 +40,8 @@ mut:
     frame_sw  time.StopWatch = time.new_stopwatch()
     second_sw time.StopWatch = time.new_stopwatch()
     
-    //  japanese flag
-    jpn_text  bool
+    //  external font file flag
+    vui_font_p  bool
 
 }
 
@@ -71,34 +72,11 @@ const (
     }
 )
 
-//  font file loading
-fn alloc_font() string {
-    //  font searching
-    //  first,  check VUI_FONT env vars.
-    mut font_path := os.getenv('VUI_FONT')
-    if font_path != '' { 
-        println('font file $font_path from env VUI_FONT')
-        return font_path 
-    }
-
-    //  second, check assets/fonts/RobotoMono-regular.ttf font
-	mut path_finder := os.join_path('.', 'assets', 'fonts', 'RobotoMono-Regular.ttf')
-	font_path = os.resource_abs_path(path_finder)
-    if os.exists_in_system_path(font_path) {
-        println('font path ; $path_finder')
-        println('resource_abs ; $font_path')
-        return font_path
-    }
-
-    //  finale, trust system ... (which called in Japanese, Maru-nage)
-    return ''
-}
-
 //  
 fn main() {
     // get font file path
     // 'cause font allocates when gg context generates.
-    font := alloc_font()
+    font := font.default()
 
     mut graph := &Graph {
         gg: 0  // place holdre for graphix context
@@ -107,7 +85,7 @@ fn main() {
         height: window_height
         width:  window_width
         draw_fn: 0
-        jpn_text: false
+        vui_font_p: false
     }
     graph.gg = gg.new_context(
         width: window_width
@@ -117,19 +95,19 @@ fn main() {
         window_title: 'Iterative Fern graphics with V new graphix handling.'
         create_window: true
         frame_fn: frame
-		keydown_fn: on_keydown
+	keydown_fn: on_keydown
         font_path: font
         bg_color: gx.white
     )
 
-    //  check japanese text display
-$if jpn ? {
-        graph.jpn_text = true
-}
-    if os.getenv('VUI_FONT') != '' {
-        graph.jpn_text = true
-    }
+    //  is VUI_FONT set ? for message selecting
+    graph.vui_font_p = if os.getenv('VUI_FONT') != '' {
+        true
+      } else {
+        false
+      }
 
+    //  generate
     graph.generate()
 
     println('Starting the graph loop...')
@@ -164,10 +142,7 @@ fn frame (mut graph Graph) {
 //  
 fn (mut graph Graph) run() {
     for {
-//  to activate showfps feature, use -d option like as '-d showfps'
-$if showfps ? {
         graph.showfps()
-}
         time.sleep(34*time.millisecond) // 30fps
     }
 }
@@ -177,7 +152,7 @@ fn (g &Graph) draw_piccells() {
     for j in 0..window_height {
         for i  in 0..window_width {
             if g.cells[i][j] == 1 {
-                g.gg.draw_rect(f32(i), f32(j), block_size-1, block_size-1, leaf_colour)
+                g.gg.draw_rect_filled(f32(i), f32(j), block_size-1, block_size-1, leaf_colour)
             }
         }
     }
@@ -185,11 +160,11 @@ fn (g &Graph) draw_piccells() {
 
 //
 fn (mut g Graph) draw_texts() {
-
-    if g.jpn_text {
-        g.gg.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
+    if g.vui_font_p {
+        // g.gg.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
+        g.gg.draw_text(20, 30, 'Графика листьев папоротника (V new Graphix handling)', text_cfg)
     } else {
-    g.gg.draw_text(20, 30, 'Iterative fern graphix (V new Graphix handling)', text_cfg)
+        g.gg.draw_text(20, 30, 'Iterative fern graphix (V new Graphix handling)', text_cfg)
     }
 }
 
