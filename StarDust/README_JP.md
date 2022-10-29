@@ -48,9 +48,12 @@ gg.system_font_path() では、
 
 ### Revision historica
 
+- 2022-10-29
+  例外処理の ? を ! へ置き換え。
+  マウス位置に応じた動きに変更。
+
 - 2022-08-04
   星の「大きさ」を盛り込んでみましたヨ。
-  
 
 - 2022-02-24
   rand.f32_in_range() が Optionを返す風に変更されたらしく、or { panic(err) } を追加して、Quick Fix

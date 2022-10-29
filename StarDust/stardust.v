@@ -106,9 +106,9 @@ fn main() {
 
     //  
     for _ in 0..stars {
-        graph.x << rand.f32_in_range(-space_width /2, space_width /2) ?
-        graph.y << rand.f32_in_range(-space_height/2, space_height/2) ?
-        graph.z << rand.f32_in_range(window_depth, space_depth) ?
+        graph.x << rand.f32_in_range(-space_width /2, space_width /2) !
+        graph.y << rand.f32_in_range(-space_height/2, space_height/2) !
+        graph.z << rand.f32_in_range(window_depth, space_depth) !
     }
 
     println('Starting the graph loop...')
@@ -149,8 +149,10 @@ fn frame (mut graph Graph) {
         mut r := f32(window_depth)/graph.z[c]*3
         if r < 1.05 { r = 1.05 }
         graph.draw_star(
-          window_width /2 + graph.x[c]*window_depth/graph.z[c], 
-          window_height/2 - graph.y[c]*window_depth/graph.z[c], 
+          graph.x[c]*window_depth/graph.z[c] + graph.mouse_x , 
+//          window_width /2 + graph.x[c]*window_depth/graph.z[c] , 
+          graph.y[c]*window_depth/graph.z[c] + graph.mouse_y , 
+//          window_height/2 - graph.y[c]*window_depth/graph.z[c] , 
           r)
       }
 
@@ -178,7 +180,6 @@ fn (mut graph Graph) run() {
     for {
         graph.update_model()
         graph.showfps()
-//        time.sleep_ms(34) // 30fps
         time.sleep(frame_rate*time.millisecond) 
     }
 }
@@ -190,12 +191,11 @@ fn (mut g Graph) draw_texts() {
         g.gg.draw_text(30, 28, '人類の冒険は、今、始まったばかりである', text_cfg)
     } else {
 //        g.gg.draw_text(30, 28, 'Space ... The final frontier', text_cfg)
-        g.gg.draw_text(30, 28, 'The human adventure is just beginning', text_cfg)
+        g.gg.draw_text(30, 28, 'The human ad\'V\'enture is just beginning', text_cfg)
     }
 }
 
 //  event handler ?
-
 fn my_event_manager(mut ev gg.Event, mut app Graph) {
         if ev.typ == .mouse_move {
                 app.mouse_x = int(ev.mouse_x)
