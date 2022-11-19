@@ -9,7 +9,7 @@
  * 
  */
 
-// Copyright (c) 2019-2021 Alexander Medvednikov. All rights reserved.
+// Copyright (c) 2019-2022 Alexander Medvednikov. All rights reserved.
 // Use of this source code is governed by an MIT license
 // that can be found in the LICENSE file.
 
@@ -21,7 +21,7 @@ import os.font
 import gx
 import gg
 import time
-//import sokol.sapp  // for key handlin'
+import sokol.sapp  // for mouse cursor handling
 import rand
 
 
@@ -36,6 +36,7 @@ mut:
     
     mouse_x  int
     mouse_y  int
+    mouse_vu bool
     
     draw_fn  voidptr
 
@@ -81,6 +82,7 @@ fn main() {
         height: window_height
         width:  window_width
         draw_fn: 0
+        mouse_vu : true
     }
     graph.gg = gg.new_context(
         width:  window_width
@@ -90,7 +92,8 @@ fn main() {
         window_title: 'Stardust.v - Graphix app example'
         create_window: true
         frame_fn: frame
-        event_fn: my_event_manager
+        init_fn: init
+        event_fn: event_handler
         keydown_fn: on_keydown
         font_path: font
         bg_color: gx.black
@@ -132,7 +135,14 @@ fn (mut graph Graph) showfps() {
     }
 }
 
-//
+//  graphix environment initialize handler
+fn init (mut graph Graph) {
+    // mouse cursor set another type (currently inactive)
+    sapp.set_mouse_cursor(.not_allowed)
+    //  hide mouse cursor
+    sapp.show_mouse(graph.mouse_vu)
+}
+
 // drawing star
 fn (mut graph Graph) draw_star (x f32, y f32, r f32) {
 
@@ -188,7 +198,7 @@ fn (mut graph Graph) run() {
 fn (mut g Graph) draw_texts() {
     if g.vui_font_p == true {
 //        g.gg.draw_text(30, 28, '宇宙 ... それは人類に残された最後の開拓地である', text_cfg)
-        g.gg.draw_text(30, 28, '人類の冒険は、今、始まったばかりである', text_cfg)
+        g.gg.draw_text(30, 28, '人類の冒険は、始まったばかりである', text_cfg)
     } else {
 //        g.gg.draw_text(30, 28, 'Space ... The final frontier', text_cfg)
         g.gg.draw_text(30, 28, 'The human ad\'V\'enture is just beginning', text_cfg)
@@ -196,11 +206,20 @@ fn (mut g Graph) draw_texts() {
 }
 
 //  event handler ?
-fn my_event_manager(mut ev gg.Event, mut app Graph) {
-        if ev.typ == .mouse_move {
-                app.mouse_x = int(ev.mouse_x)
-                app.mouse_y = int(ev.mouse_y)
+fn event_handler(mut ev gg.Event, mut app Graph) {
+    if ev.typ == .mouse_move {
+        app.mouse_x = int(ev.mouse_x)
+        app.mouse_y = int(ev.mouse_y)
+    }
+    //  toggle mouse cursor show/hide with mouse button #1
+    if ev.typ == .mouse_up {
+        if app.mouse_vu == true {
+            app.mouse_vu = false
+        } else {
+            app.mouse_vu = true
         }
+        sapp.show_mouse(app.mouse_vu)
+    }
 }
 
 //  key branching
