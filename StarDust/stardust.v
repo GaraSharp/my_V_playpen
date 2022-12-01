@@ -34,8 +34,8 @@ mut:
     height   int
     width    int
     
-    mouse_x  int
-    mouse_y  int
+//    mouse_x  int
+//    mouse_y  int
     mouse_vu bool
     
     draw_fn  voidptr
@@ -159,9 +159,9 @@ fn frame (mut graph Graph) {
         mut r := f32(window_depth)/graph.z[c]*3
         if r < 1.05 { r = 1.05 }
         graph.draw_star(
-          graph.x[c]*window_depth/graph.z[c] + graph.mouse_x , 
+          graph.x[c]*window_depth/graph.z[c] + graph.gg.mouse_pos_x , 
 //          window_width /2 + graph.x[c]*window_depth/graph.z[c] , 
-          graph.y[c]*window_depth/graph.z[c] + graph.mouse_y , 
+          graph.y[c]*window_depth/graph.z[c] + graph.gg.mouse_pos_y , 
 //          window_height/2 - graph.y[c]*window_depth/graph.z[c] , 
           r)
       }
@@ -207,12 +207,13 @@ fn (mut g Graph) draw_texts() {
 
 //  event handler ?
 fn event_handler(mut ev gg.Event, mut app Graph) {
-    if ev.typ == .mouse_move {
-        app.mouse_x = int(ev.mouse_x)
-        app.mouse_y = int(ev.mouse_y)
-    }
+//    if ev.typ == .mouse_move {
+//        app.mouse_x = int(ev.mouse_x)
+//        app.mouse_y = int(ev.mouse_y)
+//    }
     //  toggle mouse cursor show/hide with mouse button #1
     if ev.typ == .mouse_up {
+//        println('chuu ; $app.mouse_x, $app.mouse_y')
         if app.mouse_vu == true {
             app.mouse_vu = false
         } else {
@@ -235,7 +236,9 @@ fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut graph Graph) {
         }
         .space {
            println('space pressed ... ')
-           println('mouse : $graph.mouse_x, $graph.mouse_y')
+//           println('mouse : $graph.mouse_x, $graph.mouse_y')
+           println('mouse : $graph.gg.mouse_pos_x, $graph.gg.mouse_pos_y')
+           
         }
         else {}
     }

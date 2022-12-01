@@ -48,6 +48,9 @@ gg.system_font_path() では、
 
 ### Revision historica
 
+- 2022-12-01
+  マウスカーソル座標の取得がMacBook Air (BigSur, 非Retina)で不良動作だったので、修正
+
 - 2022-11-20
   マウスカーソル形状を変更し、マウスボタン押下でマウスカーソル表示のtoggleを行う様にしました
 
