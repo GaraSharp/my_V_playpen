@@ -75,7 +75,7 @@ const (
 //  
 fn main() {
     // get font file path
-    font := font.default()
+    font_name := font.default()
 
     mut graph := &Graph {
         gg: 0  // place holdre for graphix context
@@ -95,7 +95,7 @@ fn main() {
         init_fn: init
         event_fn: event_handler
         keydown_fn: on_keydown
-        font_path: font
+        font_path: font_name
         bg_color: gx.black
         fullscreen: true  // set window_with, window_height as screen size
     )
