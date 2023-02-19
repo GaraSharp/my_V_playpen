@@ -43,7 +43,7 @@ const (
 
 struct AppState {
 mut:
-	gg          &gg.Context = 0
+	gg          &gg.Context 
 	istream_idx int
 	pixels      [win_height][win_width]u32
 }
@@ -67,10 +67,10 @@ fn (mut state AppState) biom() {
       for {
         // iteration forms
         // modify these lines as you like ...
-        z = z*z*z*z*z + z*z*z + c
-        z = z.sin()+z*z - c
+//        z = z*z*z*z*z + z*z*z + c
+//        z = z.sin()+z*z - c
 //        z = z.cos().cos() + c
-//        z = (z*z*z*z+z*z+c)/z
+        z = (z*z*z*z+z*z+c)/z
         k++
         if k > 10 || z.abs() >= 10 { break }
       }
@@ -102,13 +102,31 @@ fn (mut state AppState) draw() {
 // gg callbacks:
 
 fn graphics_init(mut state AppState) {
-	state.istream_idx = state.gg.new_streaming_image(win_width, win_height, pbytes)
+	state.istream_idx = state.gg.new_streaming_image(win_width, win_height, pbytes, pixel_format: .rgba8)
+
 }
 
 fn graphics_frame(mut state AppState) {
 	state.gg.begin()
       state.draw()
 	state.gg.end()
+}
+
+//  キーイベント捕捉 
+// events
+fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut state AppState) {
+    // global keys
+    match key {
+        .escape {
+            println('ESC key pressed ... quit')
+            exit(0)
+        }
+        .q {
+           println('\'q\' pressed for ... quit')
+           exit(0)
+        }
+        else {}
+    }
 }
 
 fn main() {
@@ -121,6 +139,7 @@ fn main() {
 		init_fn: graphics_init
 		frame_fn: graphics_frame
 		user_data: state
+               keydown_fn: on_keydown
 	)
 	go state.update()
 	state.gg.run()
