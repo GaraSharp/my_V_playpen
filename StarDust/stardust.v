@@ -76,6 +76,8 @@ const (
 fn main() {
     // get font file path
     font_name := font.default()
+    mut width := 0
+    mut height := 0
 
     mut graph := &Graph {
         gg: 0  // place holdre for graphix context
@@ -84,9 +86,23 @@ fn main() {
         draw_fn: 0
         mouse_vu : true
     }
+
+println('screen : ${gg.screen_size()}')
+
+    match os.user_os() {
+        'macos' {  // Mac OS case
+            width  = gg.screen_size().width
+            height = gg.screen_size().height
+        }
+        else {
+            width  = window_width
+            height = window_height
+        }
+    }
+
     graph.gg = gg.new_context(
-        width:  window_width
-        height: window_height
+        width:  width
+        height: height
         use_ortho: true
         user_data: graph
         window_title: 'Stardust.v - Graphix app example'
