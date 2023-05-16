@@ -37,13 +37,12 @@ const (
   pic_colour   = gx.rgb(0, 0, 240)
   bak_colour   = gx.rgb(240, 240, 240)
   pbytes       = 4
-  timer_period = 20 // ms
+  timer_period = 2000 // ms
 )
-
 
 struct AppState {
 mut:
-	gg          &gg.Context 
+       gg          &gg.Context 
 	istream_idx int
 	pixels      [win_height][win_width]u32
 }
@@ -68,7 +67,7 @@ fn (mut state AppState) biom() {
         // iteration forms
         // modify these lines as you like ...
 //        z = z*z*z*z*z + z*z*z + c
-//        z = z.sin()+z*z - c
+        z = z.sin()+z*z - c
 //        z = z.cos().cos() + c
         z = (z*z*z*z+z*z+c)/z
         k++
@@ -76,7 +75,8 @@ fn (mut state AppState) biom() {
       }
 
       // set piccell on condition
-      state.pixels[j][i] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { colour_black } else { colour_white }
+      state.pixels[j][i] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { u32(gx.black.abgr8()) } else {  u32(gx.white.abgr8()) }
+//      state.pixels[j][i] = if math.abs(z.re) < 10 || math.abs(z.im) < 10 { colour_black } else { colour_white }
     }
   }
 
@@ -87,14 +87,14 @@ fn (mut state AppState) update() {
 
   for {
       state.biom()
-	  time.sleep(timer_period * time.millisecond)
+      time.sleep(timer_period * time.millisecond)
   }
 }
 
 
 fn (mut state AppState) draw() {
 	mut istream_image := state.gg.get_cached_image_by_idx(state.istream_idx)
-	istream_image.update_pixel_data(&state.pixels)
+	istream_image.update_pixel_data(unsafe {&u8(&state.pixels)} )
 	size := gg.window_size()
 	state.gg.draw_image(0, 0, size.width, size.height, istream_image)
 }
@@ -103,7 +103,6 @@ fn (mut state AppState) draw() {
 
 fn graphics_init(mut state AppState) {
 	state.istream_idx = state.gg.new_streaming_image(win_width, win_height, pbytes, pixel_format: .rgba8)
-
 }
 
 fn graphics_frame(mut state AppState) {
@@ -129,6 +128,7 @@ fn on_keydown(key gg.KeyCode, mod gg.Modifier, mut state AppState) {
     }
 }
 
+
 fn main() {
 	mut state := &AppState{}
 	state.gg = gg.new_context(
@@ -139,7 +139,7 @@ fn main() {
 		init_fn: graphics_init
 		frame_fn: graphics_frame
 		user_data: state
-               keydown_fn: on_keydown
+		keydown_fn: on_keydown
 	)
 	go state.update()
 	state.gg.run()
