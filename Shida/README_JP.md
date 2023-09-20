@@ -40,6 +40,9 @@ https://ja.wikipedia.org/wiki/%E5%8F%8D%E5%BE%A9%E9%96%A2%E6%95%B0%E7%B3%BB
 
 revision histrica : 
 
+2023-09-21 03:05:42 
+gg.draw_rect() が別のAPIとなっていたので、gg.draw_rect_filled() に置き換え。
+
 2022-08-21 04:50:53 
 os.font() が十分に良くなっているので、VUI_FONTを参照するだけに変更しました。
 
