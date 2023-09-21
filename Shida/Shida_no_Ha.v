@@ -13,6 +13,7 @@
 // module main
 
 import os
+import os.font
 import gx
 import gg
 import rand
@@ -39,8 +40,8 @@ mut:
     frame_sw  time.StopWatch = time.new_stopwatch()
     second_sw time.StopWatch = time.new_stopwatch()
     
-    //  japanese flag
-    jpn_text  bool
+    //  extended text flag
+    vui_font_p  bool
 
 }
 
@@ -71,34 +72,11 @@ const (
     }
 )
 
-//  font file loading
-fn alloc_font() string {
-    //  font searching
-    //  first,  check VUI_FONT env vars.
-    mut font_path := os.getenv('VUI_FONT')
-    if font_path != '' { 
-        println('font file $font_path from env VUI_FONT')
-        return font_path 
-    }
-
-    //  second, check assets/fonts/RobotoMono-regular.ttf font
-	mut path_finder := os.join_path('.', 'assets', 'fonts', 'RobotoMono-Regular.ttf')
-	font_path = os.resource_abs_path(path_finder)
-    if os.exists_in_system_path(font_path) {
-        println('font path ; $path_finder')
-        println('resource_abs ; $font_path')
-        return font_path
-    }
-
-    //  finale, trust system ... (which called in Japanese, Maru-nage)
-    return ''
-}
-
 //  
 fn main() {
     // get font file path
     // 'cause font allocates when gg context generates.
-    font := alloc_font()
+    font_p := font.default()
 
     mut graph := &Graph {
         gg: 0  // place holdre for graphix context
@@ -107,7 +85,7 @@ fn main() {
         height: window_height
         width:  window_width
         draw_fn: 0
-        jpn_text: false
+        vui_font_p: false
     }
     graph.gg = gg.new_context(
         width: window_width
@@ -117,17 +95,13 @@ fn main() {
         window_title: 'Iterative Fern graphics with V new graphix handling.'
         create_window: true
         frame_fn: frame
-		keydown_fn: on_keydown
-        font_path: font
+        keydown_fn: on_keydown
+        font_path: font_p
         bg_color: gx.white
     )
 
-    //  check japanese text display
-$if jpn ? {
-        graph.jpn_text = true
-}
     if os.getenv('VUI_FONT') != '' {
-        graph.jpn_text = true
+        graph.vui_font_p = true
     }
 
     graph.generate()
@@ -185,7 +159,7 @@ fn (g &Graph) draw_piccells() {
 //
 fn (mut g Graph) draw_texts() {
 
-    if g.jpn_text {
+    if g.vui_font_p {
 //        g.gg.draw_text(20, 30, 'シダの葉グラフィクス (V new Graphix handling)', text_cfg)
         g.gg.draw_text(20, 30, 'Графика листьев папоротника (V new Graphix handling)', text_cfg)
     } else {
