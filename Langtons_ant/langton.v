@@ -132,7 +132,7 @@ fn (mut graph Graph) run() {
 //  map graphix array generated
 fn (mut g Graph) map_graphix() {
 	mut istream_image := g.gg.get_cached_image_by_idx(g.istream_idx)
-	istream_image.update_pixel_data(&g.cells)
+	istream_image.update_pixel_data(unsafe {&u8(&g.cells)})
 	size := gg.window_size()
 	g.gg.draw_image(0, 0, size.width, size.height, istream_image)
 }
