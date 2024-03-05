@@ -68,7 +68,7 @@ mut:
 fn main() {
 
     mut graph := &Graph {
-        gg: 0  // place holdre for graphix context
+        gg: unsafe { 0 }   // place holdre for graphix context
         width:  win_width
         height: win_height
         xp:     win_width/2  // Ant position ; centre of window
@@ -96,7 +96,7 @@ fn main() {
 }
 
 //  frame rate (fps) and some info reports
-[if showfps ?]
+@[if showfps ?]
 fn (mut graph Graph) showfps() {
     graph.frame++
     last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0

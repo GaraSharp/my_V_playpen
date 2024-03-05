@@ -80,7 +80,7 @@ fn main() {
     mut height := 0
 
     mut graph := &Graph {
-        gg: 0  // place holdre for graphix context
+        gg: unsafe { 0 }  // place holdre for graphix context
         height: window_height
         width:  window_width
         draw_fn: 0
@@ -138,7 +138,7 @@ println('screen : ${gg.screen_size()}')
 }
 
 //  frame rate (fps) and some info reports
-[if showfps ?]
+@[if showfps ?]
 fn (mut graph Graph) showfps() {
     graph.frame++
     last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0

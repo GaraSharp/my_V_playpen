@@ -111,7 +111,8 @@ fn alloc_font() string {
         }
     }
 
-//    println('loadin fonts as ${graph.gg.config.font_path}')
+ //   println('loadin fonts as ${graph.gg.config.font_path}')
+ println('$jp_font')
     return jp_font
 }
 
@@ -122,7 +123,7 @@ fn main() {
     font := alloc_font()
 
     mut graph := &Graph {
-        gg: 0  // place holdre for graphix context
+        gg: unsafe { 0 }  // place holdre for graphix context
         height: window_height
         width:  window_width
     }
@@ -138,7 +139,7 @@ fn main() {
         font_path: font
         bg_color: gx.white
     )
-
+println('fooont::$font')
     graph.generate()
 
     println('Starting the graph loop...')
@@ -150,7 +151,7 @@ fn main() {
 
 //  frame rate (fps) and some info reports
 //  this feature activate with commenting out follow line.
-[if showfps ?]
+@[if showfps ?]
 fn (mut graph Graph) showfps() {
     graph.frame++
     last_frame_ms := f64(graph.frame_sw.elapsed().microseconds())/1000.0

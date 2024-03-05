@@ -42,13 +42,13 @@ const (
 
 struct AppState {
 mut:
-       gg          &gg.Context 
+	gg          &gg.Context  = unsafe { nil } 
 	istream_idx int
 	pixels      [win_height][win_width]u32
 }
 
 
-[live]
+@[live]
 fn (mut state AppState) biom() {
   mut x := f64(0)
   mut y := f64(0)
