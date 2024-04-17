@@ -40,6 +40,9 @@ https://ja.wikipedia.org/wiki/%E5%8F%8D%E5%BE%A9%E9%96%A2%E6%95%B0%E7%B3%BB
 
 revision histrica : 
 
+2024-04-17 18:00:13 
+どうにも居心地が悪いので、グラフィクスの方法を大幅に変更いたしました。
+
 2023-09-21 03:05:42 
 gg.draw_rect() が別のAPIとなっていたので、gg.draw_rect_filled() に置き換え。
 
