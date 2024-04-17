@@ -98,7 +98,6 @@ fn main() {
     graph.gg = gg.new_context(
         width:  win_width
         height: win_height
-        use_ortho: true
         user_data: graph
         window_title: 'Chicken leg from De Jong attractor graphics with V.'
         create_window: true

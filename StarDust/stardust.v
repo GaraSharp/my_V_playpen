@@ -103,7 +103,6 @@ println('screen : ${gg.screen_size()}')
     graph.gg = gg.new_context(
         width:  width
         height: height
-        use_ortho: true
         user_data: graph
         window_title: 'Stardust.v - Graphix app example'
         create_window: true

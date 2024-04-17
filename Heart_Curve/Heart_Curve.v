@@ -130,7 +130,6 @@ fn main() {
     graph.gg = gg.new_context(
         width: window_width
         height: window_height
-        use_ortho: true
         user_data: graph
         window_title: 'Heart function graphics with V.'
         create_window: true
