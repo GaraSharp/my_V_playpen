@@ -2,9 +2,7 @@ import math
 import os
 
 //  data file
-const (
-    data_file = 'data.dat'
-)
+const data_file = 'data.dat'
 
 struct LinearResult {
 	r2                         f64
@@ -45,35 +43,36 @@ fn linearrelationship(independent_variable []f64, dependent_variable []f64) Line
 	// R2 = n(∑xy) - (∑x)(∑y) / sqrt([n(∑x²)-(∑x)²][n(∑y²)-(∑y)²]
 	r2_value := f64((independent_variable.len * sum_xy) - (sum_x * sum_y)) / math.sqrt(f64((sum_r2_x * independent_variable.len) - (sum_x * sum_x)) * f64((sum_r2_y * dependent_variable.len) - (sum_y * sum_y)))
 	return LinearResult{
-		r2: r2_value
-		intercept: intercept_value
-		slope: slope_value
+		r2:                         r2_value
+		intercept:                  intercept_value
+		slope:                      slope_value
 		independent_variable_means: x_means
-		dependent_variable_means: y_means
+		dependent_variable_means:   y_means
 	}
 }
 
 fn main() {
+	//  read datas from file
+	f_data := os.read_lines(data_file) or { panic('File ${data_file} ist nicht existen.') }
 
-    //  read datas from file
-    f_data := os.read_lines(data_file) or { panic('File $data_file ist nicht existen.') }
+	//  compose data to array
+	mut independent_variable := []f64{}
+	mut dependent_variable := []f64{}
 
-    //  compose data to array
-    mut independent_variable := []f64{}
-    mut dependent_variable   := []f64{}
+	for item in f_data {
+		dat := item.split(' ')
+		mut s := []f64{}
+		for i in dat {
+			if i != '' {
+				s << i.f64()
+			}
+		}
+		independent_variable << s[0]
+		dependent_variable << s[1]
+	}
 
-    for item in f_data {
-        dat := item.split(' ')
-        mut s := []f64{}
-        for i in dat {
-            if i != '' { s << i.f64() }
-        }
-        independent_variable << s[0]
-        dependent_variable   << s[1]
-    }
-
-    println('indep  ; $independent_variable')
-    println('depend ; $dependent_variable')
+	println('indep  ; ${independent_variable}')
+	println('depend ; ${dependent_variable}')
 
 	result := linearrelationship(independent_variable, dependent_variable)
 	println(result)

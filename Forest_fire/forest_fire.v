@@ -1,21 +1,18 @@
 // title : forest_fire.v
 // begin : 2023-09-04 04:58
 // base  : life.v
-
 import os
 import term
 import rand
 import time
 
-const (
-	cell     = '█'
-	flat     = ' '
-	tree     = '1'
-	fire     = '█'
-	burn     = '_'
-	staten   = [flat, tree, fire, burn]
-	log_file = 'data.dat'
-)
+const cell     = '█'
+const flat     = ' '
+const tree     = '1'
+const fire     = '█'
+const burn     = '_'
+const staten   = [flat, tree, fire, burn]
+const log_file = 'data.dat'
 
 struct Game {
 mut:
@@ -150,7 +147,6 @@ fn new_game() Game {
 
 //
 fn main() {
-
 	mut g := new_game()
 	mut fires := 1
 
