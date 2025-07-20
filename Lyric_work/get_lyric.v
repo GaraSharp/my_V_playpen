@@ -120,7 +120,10 @@ fn main() {
     for idx in 0 .. str.len {
       msg_ptr := str[idx].index_after(mark_str, 0) or { 0 }
       if msg_ptr > 0 {
-        msg := deq( str[idx][msg_ptr+mark_str.len .. ].replace('<br />', '\n').replace('</a>', '') )
+        mut msg := deq( str[idx][msg_ptr+mark_str.len .. ].replace('<br />', '\n').replace('</a>', '') )
+        if msg[0..4] == '/res' {
+          msg = 'https://www.uta-net.com' + msg
+        }
         println('Jacket : $msg')
         //  downloads
         http.download_file(msg, file_name)  ! 

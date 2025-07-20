@@ -22,7 +22,6 @@ $ ./get_lyric https://www.uta-net.com/song/15685/
 
 端末上で実行すると、歌詞が取得、表示され、可能ならば ジャケも取り込める筈です。
 
-
 ## inside code
 
 ジャケの取得部分は、以下の様になっております。
@@ -40,9 +39,12 @@ $ ./get_lyric https://www.uta-net.com/song/15685/
 
 いじょ
 
-
 ## Revision historica
 
 - 2025-07-16
   first appearance
+  
+- 2025-07-20
+  quick fix for jacket resource locator.
+
 
